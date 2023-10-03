@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Department {
+  id String @id @default(uuid())
+
+  name String
+
+  /// jobs in this department
+  jobs JobListing[]
+}
+
+model JobListing {
+  id      String   @id @default(uuid())
+  created DateTime @default(now())
+  updated DateTime @updatedAt
+
+  title String
+
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  description      String
+  requirements     String[]
+  responsibilities String[]
+  benefits         String[]
+
+  type     JobType
+  payType  PayType
+  payMin   Float
+  payMax   Float?
+  schedule String
+  tags     String[]
+
+  applications JobApplication[]
+}
+
+enum PayType {
+  Hourly
+  Salary
+}
+
+enum JobType {
+  FullTime
+  PartTime
+  Contract
+  Internship
+}
+
+model JobApplication {
+  id      String   @id @default(uuid())
+  created DateTime @default(now())
+  updated DateTime @updatedAt
+
+  listingId String
+  listing   JobListing @relation(fields: [listingId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  status ApplicationStatus @default(Submitted)
+
+  resume Bytes?
+}
+
+enum Role {
+  User
+  Admin
+}
+
+enum ApplicationStatus {
+  /// application submitted, waiting for review
+  Submitted
+  /// application reviewed, waiting for decision
+  InReview
+  /// application rejected
+  Rejected
+  /// application accepted, ready for hire
+  Accepted
+  /// applicant hired
+  Hired
+}
+
+model User {
+  id      String   @id @default(uuid())
+  created DateTime @default(now())
+  updated DateTime @updatedAt
+
+  email String @unique
+  role  Role   @default(User)
+
+  /// hashed password
+  password String
+
+  firstName String
+  lastName  String
+
+  /// encrypted date of birth
+  dob   String
+  /// encrypted SSN/TIN
+  taxId String
+
+  phone String
+
+  address1 String
+  address2 String
+  city     String
+  state    String
+  zip      String
+
+  /// stored resume for applications
+  resume Bytes?
+
+  applications JobApplication[]
+}
