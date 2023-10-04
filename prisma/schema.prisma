@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Department {
@@ -34,12 +35,13 @@ model JobListing {
   responsibilities String[]
   benefits         String[]
 
-  type     JobType
-  payType  PayType
-  payMin   Float
-  payMax   Float?
-  schedule String
-  tags     String[]
+  positions Int
+  type      JobType
+  payType   PayType
+  payMin    Float
+  payMax    Float?
+  schedule  String
+  tags      String[]
 
   applications JobApplication[]
 }
@@ -70,6 +72,8 @@ model JobApplication {
   status ApplicationStatus @default(Submitted)
 
   resume Bytes?
+
+  @@unique([listingId, userId]) // one application per user per job
 }
 
 enum Role {
