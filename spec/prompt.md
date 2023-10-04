@@ -39,3 +39,16 @@ somewhere with a lot of different kinds of jobs
 
 - serif: Sutro → Roboto Serif
 - sans: Proxima Nova → Figtree
+
+## FEATURES
+
+- a page including information about benefits and/or reasons to work at the company
+- a page including at least three different job openings at the company
+- an online job application form that allows applicants to apply for jobs at the company
+- recruiter login to view applications
+- admin login to view applications and edit job postings
+- secure data storage for PII
+- email notifications for applicants and recruiters
+- mobile friendly
+- seo
+-
