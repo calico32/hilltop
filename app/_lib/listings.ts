@@ -1,8 +1,8 @@
-import { prisma } from '@/lib/database'
 import { cache } from 'react'
 import 'server-only'
+import { prisma } from './database'
 
-const getListings = cache(async () => {
+export const getListings = cache(async () => {
   const jobs = prisma.jobListing.findMany({
     include: {
       _count: true,
