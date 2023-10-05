@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -19,9 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./app/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "prisma/keypair.mjs"],
   "exclude": ["node_modules"]
 }
