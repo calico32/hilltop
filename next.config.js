@@ -4,6 +4,13 @@ const nextConfig = {
     serverActions: true,
     cpus: 8,
   },
+  images: {
+    remotePatterns: [
+      {
+        hostname: 'picsum.photos',
+      },
+    ],
+  },
 }
 
 module.exports = nextConfig
