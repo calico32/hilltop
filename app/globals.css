@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 2fr min(80ch, calc(100% - 2rem)) 2fr 1fr;
+  grid-column-gap: 0.5rem;
+}
+
+.wrapper > * {
+  grid-column: 3;
+}
+
+@layer utilities {
+  .bleed-none {
+    grid-column: 3;
+  }
+
+  .bleed-half {
+    grid-column: 2 / 5;
+  }
+
+  .bleed-full {
+    grid-column: 1 / -1;
+  }
+}
