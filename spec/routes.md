@@ -2,8 +2,7 @@
 
 | path                      | auth     | description            |
 | ------------------------- | -------- | ---------------------- |
-| /                         | ❌       | landing page           |
-| /                         | ✅       | redirect to /dashboard |
+| /                         | any      | landing page           |
 | /login                    | ❌       | login page             |
 | /login                    | ✅       | redirect to /dashboard |
 | /register                 | ❌       | register page          |

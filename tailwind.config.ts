@@ -1,3 +1,4 @@
+import headlessui from '@headlessui/tailwindcss'
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
@@ -9,8 +10,21 @@ const config: Config = {
   darkMode: 'class',
   theme: {
     extend: {
+      screens: {
+        xs: '480px',
+      },
       fontFamily: {
-        sans: ['var(--sans)', 'sans-serif'],
+        sans: [
+          'var(--sans)',
+          '-apple-system',
+          'Segoe UI',
+          'Roboto',
+          'Noto Sans',
+          'Ubuntu',
+          'Cantarell',
+          'Helvetica Neue',
+          'sans-serif',
+        ],
         serif: ['var(--serif)', 'serif'],
       },
       colors: {
@@ -27,6 +41,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [headlessui],
 }
 export default config

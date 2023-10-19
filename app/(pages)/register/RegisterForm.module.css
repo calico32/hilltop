@@ -1,0 +1,22 @@
+.registerForm {
+  grid-template-columns: 250px auto;
+  grid-column-gap: 2rem;
+
+  @apply md:grid flex flex-col;
+}
+
+.registerForm > label > label {
+  @apply font-normal block text-sm text-gray-500;
+}
+
+@media (max-width: calc(theme('screens.md') - 1px)) {
+  .registerForm h2 {
+    @apply mt-4;
+  }
+  .registerForm label {
+    @apply text-left -mb-3.5;
+  }
+  .registerForm > label > label {
+    @apply text-left mb-1;
+  }
+}

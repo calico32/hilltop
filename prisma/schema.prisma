@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -77,7 +78,8 @@ model JobApplication {
 }
 
 enum Role {
-  User
+  Applicant
+  Recruiter
   Admin
 }
 
@@ -99,24 +101,30 @@ model User {
   created DateTime @default(now())
   updated DateTime @updatedAt
 
-  email String @unique
-  role  Role   @default(User)
+  email    String   @unique
+  role     Role     @default(Applicant)
+  /// storage id for avatar
+  avatarId String?
+  avatar   Storage? @relation(fields: [avatarId], references: [id])
 
   /// hashed password
   password String
 
-  firstName String
-  lastName  String
+  firstName     String
+  middleInitial String?
+  lastName      String
+  preferredName String?
 
   /// encrypted date of birth
   dob   String
   /// encrypted SSN/TIN
   taxId String
 
-  phone String
+  /// phone number as xxxxxxxxxx
+  phone String?
 
   address1 String
-  address2 String
+  address2 String?
   city     String
   state    String
   zip      String
@@ -125,4 +133,18 @@ model User {
   resume Bytes?
 
   applications JobApplication[]
+}
+
+model Storage {
+  id      String   @id
+  created DateTime @default(now())
+  updated DateTime @updatedAt
+
+  /// name of the file
+  name String
+  /// mime type of the file
+  type String
+  /// file data
+  data Bytes
+  User User[]
 }

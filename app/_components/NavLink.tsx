@@ -8,9 +8,10 @@ import React from 'react'
 interface NavLinkProps {
   href: string
   children: React.ReactNode
+  className?: string
 }
 
-export default function NavLink({ href, children }: NavLinkProps): JSX.Element {
+export default function NavLink({ href, children, className }: NavLinkProps): JSX.Element {
   const path = usePathname()
   return (
     <Link
@@ -20,7 +21,8 @@ export default function NavLink({ href, children }: NavLinkProps): JSX.Element {
         'hover:text-gray-900  dark:hover:text-white',
         path === href
           ? 'text-black dark:text-white font-medium border-b-4 border-black dark:border-white'
-          : 'text-gray-600 dark:text-gray-300'
+          : 'text-gray-600 dark:text-gray-300',
+        className
       )}
     >
       {children}

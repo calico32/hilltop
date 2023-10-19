@@ -25,3 +25,36 @@
     grid-column: 1 / -1;
   }
 }
+
+/* .app-bar-scroll {
+  animation-timeline: scroll(root block);
+  animation-name: scroll;
+  animation-fill-mode: forwards;
+}
+
+@keyframes scroll {
+  0% {
+    backdrop-filter: blur(0);
+    background: #ffffff00;
+    color: white;
+  }
+  25% {
+    backdrop-filter: blur(12px);
+    background: #ffffffff;
+    color: black;
+  }
+  100% {
+    backdrop-filter: blur(12px);
+    background: #ffffffff;
+    color: black;
+  }
+} */
+
+.app-bar {
+  transform: translateY(0);
+  transition: transform 100ms ease-in-out;
+}
+
+.app-bar-hidden {
+  transform: translateY(-100%);
+}

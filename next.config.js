@@ -6,8 +6,10 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      { hostname: 'picsum.photos' },
       {
-        hostname: 'picsum.photos',
+        hostname: 'gravatar.com',
+        pathname: '/avatar/*',
       },
     ],
   },

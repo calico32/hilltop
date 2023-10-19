@@ -1,8 +1,8 @@
+import server from '@/_api/server'
 import ListingCard from '@/_components/ListingCard'
-import { getListings } from '@/_lib/listings'
 
 export default async function Page(): Promise<JSX.Element> {
-  const listings = await getListings()
+  const listings = await server.getListings()
 
   return (
     <>

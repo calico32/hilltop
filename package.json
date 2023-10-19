@@ -3,36 +3,59 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "keypair": "node ./prisma/keypair.mjs",
+    "dev": "concurrently -p '{name} | ' -c 'blue.dim,green.dim,cyan.dim' -n 'next ,email,ngrok' 'bun next:dev' 'bun email:dev' 'ngrok http 3000'",
+    "generate": "prisma generate --no-engine",
+    "next:dev": "next dev",
+    "email:dev": "email dev -p 3001"
   },
   "prisma": {
     "seed": "bun ./prisma/seed.ts"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.17",
+    "@headlessui/tailwindcss": "^0.2.0",
     "@prisma/client": "^5.3.1",
+    "@prisma/extension-accelerate": "^0.6.2",
+    "@react-email/button": "^0.0.10",
+    "@react-email/html": "^0.0.4",
+    "@sentry/react": "^7.73.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.0.0",
+    "dotenv": "^16.3.1",
+    "iron-webcrypto": "^0.10.1",
+    "kiyoi": "^0.3.0",
     "lucide-react": "^0.284.0",
-    "next": "latest",
+    "md5.js": "^1.3.5",
+    "nanoid": "^5.0.1",
+    "next": "^13.5.4",
+    "nodemailer": "^6.9.6",
     "prisma": "^5.3.1",
-    "react": "latest",
-    "react-dom": "latest",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-email": "^1.9.5",
     "react-hook-form": "^7.47.0",
+    "react-hot-toast": "^2.4.1",
     "server-only": "^0.0.1",
-    "uuid": "^9.0.1"
+    "swr": "^2.2.4",
+    "swr-devtools": "^1.3.2",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.4",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
+    "@types/node": "^20.8.6",
+    "@types/nodemailer": "^6.4.11",
+    "@types/react": "^18.2.28",
+    "@types/react-dom": "^18.2.13",
     "@types/uuid": "^9.0.4",
-    "autoprefixer": "latest",
-    "postcss": "latest",
-    "tailwindcss": "latest",
-    "typescript": "latest"
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.1",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.2.2"
   }
 }

@@ -1,11 +1,7 @@
 import { ApplicationStatus, JobType, PayType, PrismaClient, Role } from '@prisma/client'
 import * as bcrypt from 'bcryptjs'
-import crypto from 'crypto'
-import fs from 'fs/promises'
+import { encrypt } from 'kiyoi'
 import { v5 as uuidv5 } from 'uuid'
-
-const publicKey = await fs.readFile('public.pem', 'utf8')
-const privateKey = await fs.readFile('private.pem', 'utf8')
 
 const prisma = new PrismaClient()
 
@@ -17,7 +13,7 @@ const bob = {
   id: id('bob'),
   firstName: 'Bob',
   lastName: 'Smith',
-  email: 'bob@example.org',
+  email: 'b@b',
   password: await bcrypt.hash('password', 10),
 
   address1: '123 Main St',
@@ -26,10 +22,10 @@ const bob = {
   state: 'IL',
   zip: '12345',
 
-  dob: crypto.publicEncrypt(publicKey, Buffer.from('1990-01-01')).toString('base64'),
-  taxId: crypto.publicEncrypt(publicKey, Buffer.from('123-45-6789')).toString('base64'),
+  dob: await encrypt('1990-01-01'),
+  taxId: await encrypt('123-45-6789'),
 
-  phone: '555-555-5555',
+  phone: '5555555555',
 
   role: Role.Admin,
 }
@@ -73,7 +69,7 @@ const alice = {
   id: id('alice'),
   firstName: 'Alice',
   lastName: 'Smith',
-  email: 'alice@example.com',
+  email: 'alice@example.org',
   password: await bcrypt.hash('password', 10),
 
   address1: '123 Main St',
@@ -82,10 +78,10 @@ const alice = {
   state: 'IL',
   zip: '12345',
 
-  dob: crypto.publicEncrypt(publicKey, Buffer.from('1990-01-01')).toString('base64'),
-  taxId: crypto.publicEncrypt(publicKey, Buffer.from('123-45-6789')).toString('base64'),
+  dob: await encrypt('1990-01-01'),
+  taxId: await encrypt('123-45-6789'),
 
-  phone: '555-555-5555',
+  phone: '5555555555',
 
   applications: {
     connectOrCreate: {

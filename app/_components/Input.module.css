@@ -1,0 +1,31 @@
+.inputWrapper {
+  @apply border border-gray-400 rounded-md transition-all ease-linear relative min-h-[46px];
+
+  & .input {
+    @apply py-1 px-3 rounded-md w-full border-transparent border-y-4 outline-none transition-all ease-linear bg-transparent overflow-hidden border absolute inset-0 min-h-[40px];
+  }
+
+  & .input:focus {
+    @apply -bottom-[3px];
+  }
+
+  &:has(.input:focus):not(.error) {
+    @apply border-navyblue-0 border-b-4;
+  }
+
+  & .select {
+    @apply w-full min-h-[40px] rounded-md bg-transparent px-2 outline-none cursor-pointer;
+  }
+
+  &.error {
+    @apply border-red-400;
+  }
+
+  &.error:has(.input:focus) {
+    @apply border-red-700 border-b-4;
+  }
+}
+
+.errorText {
+  @apply text-red-500 block mt-1;
+}
