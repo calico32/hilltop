@@ -1,7 +1,7 @@
 import { Button } from '@react-email/button'
 import { Html } from '@react-email/html'
 
-export default function Email() {
+export default function ResetPassword() {
   return (
     <Html>
       <Button

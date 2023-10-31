@@ -7,6 +7,11 @@ import { Role } from '@prisma/client'
 import { Session, decrypt } from 'kiyoi'
 import { cookies } from 'next/headers'
 
+/**
+ * Retrieves a user from the database by their ID or the ID of the authenticated user's session.
+ * @param id - The ID of the user to retrieve. If not provided, retrieves the authenticated user's session.
+ * @returns The retrieved user object, or null if the user is not found or the session is invalid.
+ */
 export const getUser = cache('getUser', async (id?: string) => {
   const session = await Session.get<UserSession>(cookies())
   if (!session.ok) return null
@@ -14,6 +19,14 @@ export const getUser = cache('getUser', async (id?: string) => {
   if (!id) {
     const user = await prisma.user.findUnique({
       where: { id: session.value.userId },
+      include: {
+        _count: true,
+        applications: {
+          select: {
+            status: true,
+          },
+        },
+      },
     })
     prisma.redact(user, ['dob', 'password', 'taxId'])
     return user
@@ -23,6 +36,14 @@ export const getUser = cache('getUser', async (id?: string) => {
 
   const user = await prisma.user.findUnique({
     where: { id },
+    include: {
+      _count: true,
+      applications: {
+        select: {
+          status: true,
+        },
+      },
+    },
   })
   prisma.redact(user, ['dob', 'password', 'taxId'])
 

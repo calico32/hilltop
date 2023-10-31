@@ -9,24 +9,34 @@ import Input from '@/_components/Input'
 import { states } from '@/_lib/data'
 import { groupedNumberOnChange } from '@/_util/grouped-number-input'
 
+import { developmentDeleteUser } from '@/_api/auth'
 import { RegisterData, RegisterError } from '@/_api/types'
+import Button from '@/_components/Button'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 import styles from './RegisterForm.module.css'
 
 type RegisterFormValues = RegisterData
 
 export default function RegisterForm(): JSX.Element {
+  let deletingUser, setDeletingUser: React.Dispatch<React.SetStateAction<boolean>>
+  if (process.env.NODE_ENV === 'development') {
+    ;[deletingUser, setDeletingUser] = useState(false)
+  }
+
   const form = useForm<RegisterFormValues>({
     defaultValues: {
       state: 'State',
     },
   })
+
   const {
     register,
     handleSubmit,
     setValue,
     getValues,
     formState: { errors, isSubmitting },
+    reset,
   } = form
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -48,6 +58,13 @@ export default function RegisterForm(): JSX.Element {
         case RegisterError.TermsNotAccepted:
           toast.error('You must accept the terms of service to continue.')
           break
+        case RegisterError.SendEmailFailed:
+          toast(
+            'You have successfully registered, but we were unable to send you a verification email.',
+            {
+              icon: '📧',
+            }
+          )
       }
 
       return
@@ -399,13 +416,83 @@ export default function RegisterForm(): JSX.Element {
           receive email updates about available jobs and product updates.
         </label>
 
-        <button
+        {process.env.NODE_ENV === 'development' && (
+          <>
+            <div className="col-span-2 w-full flex justify-around gap-2 items-baseline mt-8">
+              <span className="italic text-gray-500 text-lg">Developer tools:</span>
+              <Button
+                type="button"
+                color="accent"
+                small
+                onClick={() => {
+                  setValue('firstName', 'John')
+                  setValue('middleInitial', 'Q')
+                  setValue('lastName', 'Doe')
+                  setValue('preferredName', 'Johnny Doe')
+                  setValue('dob', '1990-01-01')
+                  setValue('taxId', '123-45-6789')
+                  setValue('address1', '123 Main St')
+                  setValue('address2', 'Apt 1')
+                  setValue('city', 'Anytown')
+                  setValue('state', 'CA')
+                  setValue('zip', '12345')
+                  setValue('email', 'john@example.org')
+                  setValue('phone', '123-456-7890')
+                  setValue('password', 'Password1')
+                  setValue('confirmPassword', 'Password1')
+                  setValue('terms', true)
+                  setValue('privacy', true)
+                  setValue('disclaimer', true)
+                  setValue('emailUpdates', true)
+                }}
+              >
+                Populate test data
+              </Button>
+              <Button
+                type="button"
+                minimal
+                small
+                color="accent"
+                onClick={() => {
+                  reset()
+                }}
+              >
+                Clear form
+              </Button>
+              <Button
+                type="button"
+                minimal
+                small
+                color="danger"
+                loading={deletingUser}
+                onClick={async () => {
+                  setDeletingUser?.(true)
+                  const res = await developmentDeleteUser(process.env.NEXT_PUBLIC_DELETE_USER_KEY!)
+                  setDeletingUser?.(false)
+
+                  if (!res.ok) {
+                    toast.error('An error occurred while deleting the test user.')
+                    return
+                  }
+
+                  toast.success('Successfully deleted the test user.')
+                }}
+              >
+                Delete test user
+              </Button>
+            </div>
+          </>
+        )}
+
+        <Button
           type="submit"
-          className="col-start-1 col-span-2 w-max mx-auto mt-8 bg-navyblue-0 text-white font-semibold text-lg py-3 px-8 hover:brightness-110 rounded-md shadow-md"
+          color="primary"
+          loading={isSubmitting}
+          className="col-start-1 col-span-2 w-max mx-auto mt-8 text-lg hover:brightness-110"
           disabled={isSubmitting}
         >
           Register
-        </button>
+        </Button>
       </FormProvider>
     </form>
   )

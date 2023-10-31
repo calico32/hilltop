@@ -1,21 +1,36 @@
+/**
+ * @file This file contains functions related to user authentication and authorization.
+ * @summary This module exports functions for user login, logout, registration, email verification, password reset, and user deletion.
+ */
 'use server'
 
 import { Prisma, User } from '@prisma/client'
 import * as bcrypt from 'bcryptjs'
 import crypto from 'crypto'
-import * as Iron from 'iron-webcrypto'
 import { cookies } from 'next/headers'
 
 import {
+  ActionError,
   LoginError,
   PasswordResetData,
   PasswordResetError,
   RegisterData,
   RegisterError,
+  SendVerificationEmailError,
+  VerifyEmailData,
+  VerifyEmailError,
 } from '@/_api/types'
 import { prisma } from '@/_lib/database'
-import { Result, Session, encrypt, expires } from 'kiyoi'
+import { sendEmail } from '@/_lib/email'
+import { Result, Session, decrypt, encrypt, expires } from 'kiyoi'
+import VerifyEmail from '../../emails/VerifyEmail'
 
+/**
+ * Authenticates a user with the provided email and password.
+ * @param email The email of the user to authenticate.
+ * @param password The password of the user to authenticate.
+ * @returns An asynchronous result containing either the authenticated user or a login error.
+ */
 export async function login(email: string, password: string): Result.Async<User, LoginError> {
   const user = await prisma.user.findUnique({ where: { email } })
   if (!user) return Result.error(LoginError.InvalidCredentials)
@@ -35,10 +50,6 @@ export async function login(email: string, password: string): Result.Async<User,
   await Session.save(session, cookies())
 
   return Result.ok(user)
-}
-
-export async function passkeyLogin(passkey: any): Result.Async<User, LoginError> {
-  throw new Error('Not implemented')
 }
 
 export async function logout(): Result.Async<void, never> {
@@ -65,14 +76,43 @@ export async function register(
   ])
 
   try {
+    const userData: RegisterData = data
+    prisma.redact(userData, [
+      'password',
+      'confirmPassword',
+      'terms',
+      'privacy',
+      'disclaimer',
+      'dob',
+      'taxId',
+    ])
     const user = await prisma.user.create({
       data: {
-        ...data,
+        ...userData,
         dob,
         taxId,
         password,
       },
     })
+
+    const tokenData: VerifyEmailData = {
+      id: user.id,
+      email: user.email,
+      expires: Date.now() + 1000 * 60 * 60 * 24,
+    }
+
+    const token = await encrypt(tokenData)
+
+    const res = await sendEmail(VerifyEmail, {
+      subject: 'Verify your email on Hilltop',
+      to: user.email,
+      props: {
+        name: user.preferredName?.split(' ')[0] ?? user.firstName,
+        token,
+      },
+    })
+
+    if (!res.ok) return Result.error(RegisterError.SendEmailFailed)
 
     return Result.ok({
       id: user.id,
@@ -87,8 +127,57 @@ export async function register(
       }
     }
 
+    console.error(err)
+
     return Result.error(RegisterError.ServerError)
   }
+}
+
+export async function sendVerificationEmail(): Result.Async<void, SendVerificationEmailError> {
+  const session = await Session.get(cookies())
+  if (!session.ok) return Result.error(SendVerificationEmailError.Unauthorized)
+
+  const user = await prisma.user.findUnique({ where: { id: session.value.userId } })
+  if (!user) return Result.error(SendVerificationEmailError.Unauthorized)
+
+  const tokenData: VerifyEmailData = {
+    id: user.id,
+    email: user.email,
+    expires: Date.now() + 1000 * 60 * 60 * 24,
+  }
+
+  const token = await encrypt(tokenData)
+
+  const res = await sendEmail(VerifyEmail, {
+    subject: 'Verify your email on Hilltop',
+    to: user.email,
+    props: {
+      name: user.preferredName?.split(' ')[0] ?? user.firstName,
+      token,
+    },
+  })
+
+  if (!res.ok) return Result.error(SendVerificationEmailError.SendEmailFailed)
+
+  return Result.ok()
+}
+
+export async function verifyEmail(token: string): Result.Async<void, VerifyEmailError> {
+  const data = await decrypt<VerifyEmailData>(token)
+  if (!data) return Result.error(VerifyEmailError.ServerError)
+
+  if (data.expires < Date.now()) return Result.error(VerifyEmailError.ExpiredToken)
+
+  const user = await prisma.user.findUnique({ where: { id: data.id } })
+  if (!user) return Result.error(VerifyEmailError.InvalidToken)
+
+  if (user.emailVerified) return Result.error(VerifyEmailError.AlreadyVerified)
+
+  if (user.email !== data.email) return Result.error(VerifyEmailError.EmailMismatch)
+
+  await prisma.user.update({ where: { id: user.id }, data: { emailVerified: true } })
+
+  return Result.ok()
 }
 
 export async function forgotPassword(email: string): Result.Async<void, never> {
@@ -103,7 +192,7 @@ export async function forgotPassword(email: string): Result.Async<void, never> {
     hash,
   }
 
-  const token = await Iron.seal(crypto, data, process.env.SESSION_SECRET!, Iron.defaults)
+  const token = await encrypt(data)
 
   const url = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${encodeURIComponent(
     token
@@ -126,12 +215,7 @@ export async function resetPassword(
   password: string,
   confirmPassword: string
 ): Result.Async<void, PasswordResetError> {
-  const data = (await Iron.unseal(
-    crypto,
-    token,
-    process.env.SESSION_SECRET!,
-    Iron.defaults
-  )) as PasswordResetData
+  const data = await decrypt<PasswordResetData>(token)
   if (!data) return Result.error(PasswordResetError.InvalidToken)
 
   if (data.expires < Date.now()) return Result.error(PasswordResetError.ExpiredToken)
@@ -152,12 +236,7 @@ export async function resetPassword(
 export async function isPasswordResetTokenValid(
   token: string
 ): Result.Async<void, PasswordResetError> {
-  const data = (await Iron.unseal(
-    crypto,
-    token,
-    process.env.SESSION_SECRET!,
-    Iron.defaults
-  )) as PasswordResetData
+  const data = await decrypt<PasswordResetData>(token)
   if (!data) return Result.error(PasswordResetError.InvalidToken)
 
   if (data.expires < Date.now()) return Result.error(PasswordResetError.ExpiredToken)
@@ -169,4 +248,22 @@ export async function isPasswordResetTokenValid(
   if (tokenHash !== data.hash) return Result.error(PasswordResetError.InvalidToken)
 
   return Result.ok()
+}
+
+export async function developmentDeleteUser(key: string): Result.Async<void, ActionError> {
+  if (
+    process.env.NODE_ENV !== 'development' ||
+    !key ||
+    key !== process.env.NEXT_PUBLIC_DELETE_USER_KEY
+  )
+    return Result.error(ActionError.ServerError)
+  try {
+    await prisma.user.deleteMany({
+      where: { email: 'john@example.org' },
+    })
+    return Result.ok()
+  } catch (err) {
+    console.log(err)
+    return Result.error(ActionError.ServerError)
+  }
 }

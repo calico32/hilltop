@@ -18,7 +18,7 @@ interface AppBarMenuProps {
 }
 
 export default function AppBarMenu({ landing }: AppBarMenuProps): JSX.Element {
-  const { isLoading, data: user } = api.use('getUser')
+  const { isLoading, data: user } = api.$use('getUser')
 
   // const fn = getUser
   // const fnName = 'getUser'
@@ -51,10 +51,10 @@ export default function AppBarMenu({ landing }: AppBarMenuProps): JSX.Element {
         <LoginMenu />
       ) : (
         <>
-          <NavLink href="/dashboard" className="hidden md:contents">
-            Your Dashboard
-          </NavLink>
-          <Menu as="div" className="relative inline-block ml-4 text-left">
+          <div className="hidden md:contents">
+            <NavLink href="/dashboard">Your Dashboard</NavLink>
+          </div>
+          <Menu as="div" className="relative inline-block ml-6 text-left">
             <div>
               <Menu.Button className="flex items-baseline w-full justify-center rounded-md font-medium focus:outline-none focus-visible:ring-2 pb-1.5">
                 <Image
@@ -91,12 +91,13 @@ export default function AppBarMenu({ landing }: AppBarMenuProps): JSX.Element {
                     </button>
                   </Menu.Item>
                   <Menu.Item>
-                    <button
+                    <Link
                       className={`ui-active:bg-navyblue-0 ui-active:text-white text-gray-900 group flex w-full items-center rounded-md px-2 py-2`}
+                      href="/settings"
                     >
                       <Settings className="w-5 h-5 mr-2" aria-hidden="true" />
                       Settings
-                    </button>
+                    </Link>
                   </Menu.Item>
                 </div>
                 <div className="px-1 py-1">
@@ -116,7 +117,7 @@ export default function AppBarMenu({ landing }: AppBarMenuProps): JSX.Element {
                       onClick={async () => {
                         const loading = toast.loading('Signing you out...')
                         await api.logout()
-                        await api.mutate('getUser', [], null)
+                        await api.$mutate('getUser', [], null)
                         router.push('/')
                         toast.success('Signed out successfully. Have a nice day!', { id: loading })
                       }}

@@ -7,12 +7,11 @@ import { useState } from 'react'
 
 export default function Page(): JSX.Element {
   const [searchTerm, setSearchTerm] = useState('')
-  const { data: applications, isLoading } = api.use('searchApplications', searchTerm)
+  const { data: applications, isLoading } = api.$use('searchApplications', searchTerm)
 
   return (
     <>
       <h1 className="mb-4 text-3xl font-bold">Applications</h1>
-      {/* <label>Search Applications</label> */}
       <input
         id="search"
         type="text"

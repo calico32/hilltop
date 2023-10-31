@@ -1,8 +1,8 @@
 'use client'
 
 import api from '@/_api/client'
-import logo from '@/_assets/logo.png'
 import Button from '@/_components/Button'
+import Logo from '@/_components/Logo'
 import NavLink from '@/_components/NavLink'
 import Spinner from '@/_components/Spinner'
 import { fullName } from '@/_lib/name'
@@ -23,7 +23,7 @@ interface AppBarMobileMenuProps {
 export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JSX.Element {
   const router = useRouter()
   const [open, setOpen] = useState(false)
-  const { data: user, isLoading } = api.use('getUser')
+  const { data: user, isLoading } = api.$use('getUser')
   const pathname = usePathname()
   const [signingOut, setSigningOut] = useState(false)
 
@@ -80,12 +80,12 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
               <Dialog.Panel className="w-full p-4 bg-white divide-y-2 divide-gray-200">
                 <div>
                   <div className="flex items-baseline h-full">
-                    <Link href="/" className="self-center mt-2 sm:mt-0">
-                      <Image src={logo} width={38} alt="" />
+                    <Link href="/" className="self-center mr-4">
+                      <Logo size={36} />
                     </Link>
 
                     <Link href="/">
-                      <h1 className="ml-2 font-serif text-2xl font-medium">Hilltop</h1>
+                      <h1 className="font-serif text-2xl font-medium">Hilltop</h1>
                     </Link>
                     <div className="flex-grow" />
                     <button
@@ -146,7 +146,7 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
                             setSigningOut(true)
                             const loading = toast.loading('Signing you out...')
                             await api.logout()
-                            await api.mutate('getUser', [], null)
+                            await api.$mutate('getUser', [], null)
                             router.push('/')
                             toast.success('Signed out successfully. Have a nice day!', {
                               id: loading,

@@ -1,10 +1,11 @@
+import { render } from '@react-email/components'
+import { Result } from 'kiyoi'
 import { createTransport } from 'nodemailer'
+import React from 'react'
 
 export const transport = createTransport({
   host: process.env.EMAIL_HOST,
   port: Number(process.env.EMAIL_PORT),
-  secure: process.env.EMAIL_SECURE === 'true',
-  authMethod: 'STARTTLS',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
@@ -43,3 +44,31 @@ export async function sendMail(to: string, data: EmailData): Promise<void> {
 //     text,
 //   })
 // }
+
+interface EmailOptions<P extends {}, T extends React.ComponentType<P>> {
+  props: P
+
+  subject: string
+  to: string
+  from?: string
+  replyTo?: string
+}
+
+export async function sendEmail<P extends {}, T extends React.ComponentType<P>>(
+  component: T,
+  options: EmailOptions<P, T>
+): Result.Async<void, Error> {
+  const html = render(React.createElement(component, options.props))
+  const text = render(React.createElement(component, options.props), { plainText: true })
+
+  await transport.sendMail({
+    from: options.from ?? process.env.EMAIL_FROM,
+    replyTo: options.replyTo ?? process.env.EMAIL_REPLY_TO,
+    to: options.to,
+    subject: options.subject,
+    html,
+    text,
+  })
+
+  return Result.ok()
+}

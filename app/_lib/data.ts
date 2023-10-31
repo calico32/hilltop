@@ -1,3 +1,5 @@
+import { JobType } from '@prisma/client'
+
 export const states = {
   AL: 'Alabama',
   AK: 'Alaska',
@@ -49,4 +51,11 @@ export const states = {
   WV: 'West Virgina',
   WI: 'Wisconsin',
   WY: 'Wyoming',
+}
+
+export const jobTypes: Record<JobType, string> = {
+  [JobType.FullTime]: 'Full Time',
+  [JobType.PartTime]: 'Part Time',
+  [JobType.Contract]: 'Contract',
+  [JobType.Internship]: 'Internship',
 }

@@ -26,30 +26,6 @@
   }
 }
 
-/* .app-bar-scroll {
-  animation-timeline: scroll(root block);
-  animation-name: scroll;
-  animation-fill-mode: forwards;
-}
-
-@keyframes scroll {
-  0% {
-    backdrop-filter: blur(0);
-    background: #ffffff00;
-    color: white;
-  }
-  25% {
-    backdrop-filter: blur(12px);
-    background: #ffffffff;
-    color: black;
-  }
-  100% {
-    backdrop-filter: blur(12px);
-    background: #ffffffff;
-    color: black;
-  }
-} */
-
 .app-bar {
   transform: translateY(0);
   transition: transform 100ms ease-in-out;
@@ -57,4 +33,80 @@
 
 .app-bar-hidden {
   transform: translateY(-100%);
+}
+
+.icon {
+  font-family: 'Font Awesome 6 Duotone';
+  position: relative;
+  padding-left: 1.25em;
+}
+
+.icon::before,
+.icon::after {
+  font: var(--fa-font-duotone);
+
+  display: inline-block;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25em;
+  text-align: center;
+
+  font-style: normal;
+}
+
+.icon::before {
+  color: var(--fa-primary-color, inherit);
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.icon::after {
+  color: var(--fa-secondary-color, inherit);
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+@font-face {
+  font-family: 'Font Awesome 6 Duotone';
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url(/fa.woff2) format('woff2');
+}
+
+.fa-mountain-city:before {
+  content: '\e52e';
+}
+
+.fa-mountain-city:after {
+  content: '\e52e\e52e';
+}
+
+.dark .logo {
+  --fa-primary-color: theme('colors.emerald.500');
+  --fa-secondary-color: theme('colors.emerald.500');
+}
+
+.logo {
+  --fa-primary-color: theme('colors.emerald.700');
+  --fa-secondary-color: theme('colors.emerald.700');
+}
+
+.skeleton > * * {
+  background-color: #ddd;
+  background-image: linear-gradient(90deg, #ddd, #eee, #ddd);
+  background-size: 200%;
+  color: transparent !important;
+  user-select: none;
+  z-index: 10 !important;
+  box-shadow: none !important;
+  @apply animate-pulse rounded-md;
+}
+
+.skeleton > * *:hover {
+  filter: brightness(1) !important;
+  cursor: default !important;
 }

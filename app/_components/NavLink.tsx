@@ -13,15 +13,16 @@ interface NavLinkProps {
 
 export default function NavLink({ href, children, className }: NavLinkProps): JSX.Element {
   const path = usePathname()
+
   return (
     <Link
       href={href}
       className={clsx(
         'pb-1.5',
-        'hover:text-gray-900  dark:hover:text-white',
+        'hover:text-gray-900  dark:hover:text-white border-b-4',
         path === href
-          ? 'text-black dark:text-white font-medium border-b-4 border-black dark:border-white'
-          : 'text-gray-600 dark:text-gray-300',
+          ? 'text-black dark:text-white font-medium border-black dark:border-white'
+          : 'text-gray-600 dark:text-gray-300 border-transparent',
         className
       )}
     >

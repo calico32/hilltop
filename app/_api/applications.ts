@@ -8,6 +8,12 @@ import { Prisma, Role } from '@prisma/client'
 import { Session } from 'kiyoi'
 import { cookies } from 'next/headers'
 
+/**
+ * Retrieves job applications from the database.
+ * - If the user is an applicant, only their applications are returned.
+ * - If the user is not an applicant, all applications are returned.
+ * @returns A promise that resolves to an array of job applications.
+ */
 export const getApplications = cache(async () => {
   const session = await Session.get<UserSession>(cookies())
   if (!session.ok) return null
@@ -32,6 +38,13 @@ export const getApplications = cache(async () => {
   return applications
 })
 
+/**
+ * Retrieves a job application from the database by its ID.
+ * - If the user is an applicant, only their applications are returned.
+ * - If the user is not an applicant, all applications are returned.
+ * @param id - The ID of the job application to retrieve.
+ * @returns A promise that resolves to the retrieved job application, or null if the application is not found or the user is not authorized to view it.
+ */
 export const getApplication = cache(async (id: string) => {
   const session = await Session.get<UserSession>(cookies())
   if (!session.ok) return null

@@ -1,4 +1,5 @@
 import { JobListing, PayType } from '@prisma/client'
+import Link from 'next/link'
 
 interface ListingCardProps {
   listing: JobListing
@@ -6,7 +7,10 @@ interface ListingCardProps {
 
 export default function ListingCard({ listing }: ListingCardProps): JSX.Element {
   return (
-    <div className="flex flex-col p-3 gap-2 rounded-md shadow-md border border-gray-300">
+    <Link
+      className="flex flex-col p-3 gap-2 rounded-md shadow-md border border-gray-300"
+      href={`/jobs/${listing.id}`}
+    >
       <h1 className="text-xl font-semibold">{listing.title}</h1>
       <h2>
         {formatPay(
@@ -21,7 +25,7 @@ export default function ListingCard({ listing }: ListingCardProps): JSX.Element 
         ))}
       </h2>
       <h2>{listing.type}</h2>
-    </div>
+    </Link>
   )
 }
 

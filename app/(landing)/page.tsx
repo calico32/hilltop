@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import Link from 'next/link'
 
 export default async function Home() {
   return (
@@ -8,6 +7,7 @@ export default async function Home() {
         src={(await import('@/_assets/header.png')).default}
         width={3200}
         height={2100}
+        priority
         alt=""
         className="absolute -z-10 w-full brightness-75 object-cover bleed-full h-[400px]"
       />
@@ -18,23 +18,20 @@ export default async function Home() {
 
       <div className="font-serif mt-8">
         <h1 className="text-5xl">Welcome to Lantern Hill</h1>
-        <h2 className="text-3xl mt-1 ml-4 text-emeraldgreen-1">Senior Living Community</h2>
+        <h2 className="text-3xl mt-1 text-emeraldgreen-1">Senior Living Community</h2>
         <p className="pb-2">
           Latern Hill Senior Living Community provides modern apartments for our tenets. We strive
           to provide the best experience we can. We do more than provide excellent customer service,
           we provide a great employee experience. Workers can expect health insurance, dental
           insurance, scholarships, and more. Join our team today!
         </p>
-        <Link className="text-3xl bg-emeraldgreen-0 hover:bg-basegray-0" href="/jobs/">
-          Join Here
-        </Link>
       </div>
       <p>
-        m ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque a auctor nisi. Aenean nec
-        ornare augue. Aliquam in lacus id augue rhoncus laoreet. Proin et urna tempor, tempus lorem
-        vel, rutrum turpis. Duis egestas quam sit amet turpis sodales consequat. Donec sagittis arcu
-        magna, eu condimentum magna elementum vel. Donec at ullamcorper lorem, sed imperdiet nulla.
-        Vivamus sed urna sapien. Quisque consectetur nunc sed pulvinar aliquet.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque a auctor nisi. Aenean
+        nec ornare augue. Aliquam in lacus id augue rhoncus laoreet. Proin et urna tempor, tempus
+        lorem vel, rutrum turpis. Duis egestas quam sit amet turpis sodales consequat. Donec
+        sagittis arcu magna, eu condimentum magna elementum vel. Donec at ullamcorper lorem, sed
+        imperdiet nulla. Vivamus sed urna sapien. Quisque consectetur nunc sed pulvinar aliquet.
       </p>
       <p>
         Quisque vitae ultricies mi. Nam euismod ornare magna id accumsan. Nullam a libero ipsum.

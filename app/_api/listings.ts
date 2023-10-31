@@ -12,3 +12,16 @@ export const getListings = cache(async () => {
   })
   return jobs
 })
+
+export const getListing = cache(async (id: string) => {
+  const job = prisma.jobListing.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      _count: true,
+      department: true,
+    },
+  })
+  return job
+})
