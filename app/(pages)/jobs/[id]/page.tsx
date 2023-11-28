@@ -1,13 +1,17 @@
 import server from '@/_api/server'
-import Button from '@/_components/Button'
+import { LinkButton } from '@/_components/Button'
+import { Role } from '@prisma/client'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 export default async function Page({ params }: { params: { id: string } }): Promise<JSX.Element> {
-  await new Promise((resolve) => setTimeout(resolve, 1000))
   const listing = await server.getListing(params.id)
   if (!listing) return notFound()
+  const currentUser = await server.getUser()
+  const application = currentUser
+    ? await server.getApplication({ listingId: listing.id, userId: currentUser.id })
+    : null
 
   return (
     <>
@@ -21,13 +25,31 @@ export default async function Page({ params }: { params: { id: string } }): Prom
           <h2 className="mt-px font-bold text-gray-400 text-lg">in {listing.department.name}</h2>
         </div>
         <div className="flex-grow" />
-        <div className="flex flex-col w-40">
-          <Button as={Link} href={`/jobs/${params.id}/apply`} className="w-full" color="primary">
-            Apply now
-          </Button>
+        <div className="flex flex-col w-40 items-end">
+          {!currentUser || currentUser.role === Role.Applicant ? (
+            <LinkButton
+              href={`/jobs/${params.id}/apply`}
+              className="w-full hover:!brightness-100 opacity-50"
+              color="primary"
+              disabled={!!application}
+            >
+              Apply now
+            </LinkButton>
+          ) : (
+            <LinkButton
+              href={`/applications?jobId=${params.id}`}
+              className="w-full"
+              color="primary"
+            >
+              Review applications
+            </LinkButton>
+          )}
           <span className="mt-2 text-right text-gray-500">
-            {listing._count.applications} other application
-            {listing._count.applications === 1 ? '' : 's'} for this position
+            {application
+              ? 'You have already applied for this position.'
+              : `${listing._count.applications}
+            ${!currentUser || currentUser.role === Role.Applicant ? 'other' : ''} application
+            ${listing._count.applications === 1 ? '' : 's'} for this position`}
           </span>
         </div>
       </div>

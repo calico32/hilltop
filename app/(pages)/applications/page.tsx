@@ -8,6 +8,7 @@ import { useState } from 'react'
 export default function Page(): JSX.Element {
   const [searchTerm, setSearchTerm] = useState('')
   const { data: applications, isLoading } = api.$use('searchApplications', searchTerm)
+  const { data: currentUser, isLoading: userLoading } = api.$use('getUser')
 
   return (
     <>
@@ -20,13 +21,17 @@ export default function Page(): JSX.Element {
         className="p-1 rounded-md border border-gray-300"
       />
       <div className="pt-4">
-        {isLoading ? (
+        {isLoading || userLoading ? (
           <Spinner />
         ) : !applications || applications.length === 0 ? (
           <p>No applications found.</p>
         ) : (
           applications.map((application) => (
-            <ApplicationCard key={application.id} application={application} />
+            <ApplicationCard
+              key={application.id}
+              application={application}
+              currentUser={currentUser}
+            />
           ))
         )}
       </div>

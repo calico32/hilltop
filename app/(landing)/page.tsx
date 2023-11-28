@@ -1,15 +1,16 @@
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default async function Home() {
   return (
     <>
       <Image
-        src={(await import('@/_assets/header.png')).default}
+        src={(await import('@/_assets/senior2.png')).default}
         width={3200}
         height={2100}
         priority
         alt=""
-        className="absolute -z-10 w-full brightness-75 object-cover bleed-full h-[400px]"
+        className="absolute -z-10 w-full brightness-75 object-cover object-center bleed-full h-[400px]"
       />
 
       <div className="h-[320px] flex-col text-white text-4xl flex justify-center p-8 drop-shadow-md !bleed-half">
@@ -17,23 +18,26 @@ export default async function Home() {
       </div>
 
       <div className="font-serif mt-8">
-        <h1 className="text-5xl">Welcome to Lantern Hill</h1>
-        <h2 className="text-3xl mt-1 text-emeraldgreen-1">Senior Living Community</h2>
-        <p className="pb-2">
+        <h1 className="text-5xl text-center">Welcome to Lantern Hill</h1>
+        <h2 className="text-3xl mt-1 text-emeraldgreen-1 text-center">Senior Living Community</h2>
+        <p className="pb-2 ml-8 mr-8">
           Latern Hill Senior Living Community provides modern apartments for our tenets. We strive
           to provide the best experience we can. We do more than provide excellent customer service,
           we provide a great employee experience. Workers can expect health insurance, dental
-          insurance, scholarships, and more. Join our team today!
+          insurance, scholarships, and more.{' '}
+          <Link className="text-emeraldgreen-1" href="/register">
+            <u>Join our team today!</u>
+          </Link>
         </p>
       </div>
-      <p>
+      <p className="mr-8 ml-8">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque a auctor nisi. Aenean
         nec ornare augue. Aliquam in lacus id augue rhoncus laoreet. Proin et urna tempor, tempus
         lorem vel, rutrum turpis. Duis egestas quam sit amet turpis sodales consequat. Donec
         sagittis arcu magna, eu condimentum magna elementum vel. Donec at ullamcorper lorem, sed
         imperdiet nulla. Vivamus sed urna sapien. Quisque consectetur nunc sed pulvinar aliquet.
       </p>
-      <p>
+      <p className="mr-8 ml-8">
         Quisque vitae ultricies mi. Nam euismod ornare magna id accumsan. Nullam a libero ipsum.
         Integer eu mattis arcu. Morbi pulvinar magna nec risus sagittis, ut blandit tellus interdum.
         Suspendisse aliquam eros vitae laoreet consequat. Fusce a nibh nisi. Sed scelerisque semper
@@ -43,7 +47,7 @@ export default async function Home() {
         tristique arcu et venenatis placerat. Vestibulum mollis sem a elit aliquet imperdiet. Sed
         quis odio vel libero varius feugiat ac id felis.
       </p>
-      <p>
+      <p className="mr-8 ml-8">
         Ut suscipit nulla dolor, pellentesque egestas nunc sodales et. Maecenas pulvinar orci vel
         tincidunt pulvinar. Aliquam pharetra luctus egestas. Pellentesque ipsum orci, consectetur
         non massa non, iaculis molestie nibh. Aliquam nec purus finibus, blandit leo non, eleifend
@@ -53,7 +57,7 @@ export default async function Home() {
         augue volutpat, eget gravida ipsum interdum. Nullam aliquam vehicula metus sit amet
         vehicula. Vestibulum eu massa in augue hendrerit ullamcorper. Nunc eget erat magna.
       </p>
-      <p>
+      <p className="mr-8 ml-8">
         Donec hendrerit mauris sit amet dui aliquam sodales. Vivamus tempor et elit a blandit.
         Maecenas aliquet, lectus ut pellentesque lacinia, nisi ex hendrerit dolor, a ornare massa
         elit vitae nibh. In vitae dui orci. Etiam non diam dolor. Vestibulum vel viverra leo, ac
@@ -61,7 +65,7 @@ export default async function Home() {
         pretium arcu. Donec risus urna, ultrices nec nisl in, blandit auctor nisl. Vestibulum
         euismod efficitur elit.
       </p>
-      <p>
+      <p className="mr-8 ml-8">
         Proin sed justo et neque hendrerit dignissim id ut urna. Mauris tortor erat, facilisis quis
         nulla et, dapibus posuere massa. Proin finibus sem eget sollicitudin interdum. Aliquam erat
         volutpat. Nulla facilisi. Proin lorem felis, consectetur ut vulputate consequat, fermentum

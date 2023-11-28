@@ -61,9 +61,7 @@ export default function VerifyEmail({
                   </Text>
 
                   <Button
-                    pY={18}
-                    pX={48}
-                    className="rounded-md text-white bg-navyblue-0 text-lg text-center w-max mx-auto block mb-10"
+                    className="py-4 px-12 rounded-md text-white bg-navyblue-0 text-lg text-center w-max mx-auto block mb-10"
                     href={url}
                   >
                     Verify email

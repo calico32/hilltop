@@ -54,9 +54,6 @@ export async function login(email: string, password: string): Result.Async<User,
 
 export async function logout(): Result.Async<void, never> {
   Session.destroy(cookies())
-
-  await new Promise((resolve) => setTimeout(resolve, 250))
-
   return Result.ok()
 }
 

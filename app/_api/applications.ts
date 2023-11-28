@@ -4,74 +4,142 @@ import { cache } from 'react'
 
 import { UserSession } from '@/_api/types'
 import { prisma } from '@/_lib/database'
-import { Prisma, Role } from '@prisma/client'
-import { Session } from 'kiyoi'
+import { age } from '@/_lib/format'
+import {
+  Department,
+  JobApplication,
+  JobApplicationQuestion,
+  JobListing,
+  JobListingQuestion,
+  Prisma,
+  Role,
+  Storage,
+  User,
+} from '@prisma/client'
+import { Session, decrypt } from 'kiyoi'
 import { cookies } from 'next/headers'
 
-/**
- * Retrieves job applications from the database.
- * - If the user is an applicant, only their applications are returned.
- * - If the user is not an applicant, all applications are returned.
- * @returns A promise that resolves to an array of job applications.
- */
-export const getApplications = cache(async () => {
+export type FullApplication = JobApplication & {
+  listing: JobListing & {
+    department: Department
+    _count: Prisma.JobListingCountOutputType
+    questions: JobListingQuestion[]
+  }
+  questions: JobApplicationQuestion[]
+  user: User & { age: number }
+  reviewer?: Pick<User, 'firstName' | 'lastName' | 'preferredName' | 'avatarId' | 'email'> | null
+  resume: Pick<Storage, 'name' | 'type' | 'size' | 'id'> | null
+}
+
+const reviewerSelect = Prisma.validator<Prisma.UserSelect>()({
+  firstName: true,
+  lastName: true,
+  preferredName: true,
+  avatarId: true,
+  email: true,
+})
+
+const applicationInclude = Prisma.validator<Prisma.JobApplicationInclude>()({
+  listing: {
+    include: {
+      _count: true,
+      department: true,
+      questions: true,
+    },
+  },
+  questions: true,
+  resume: {
+    select: {
+      name: true,
+      type: true,
+      size: true,
+      id: true,
+    },
+  },
+  user: true,
+  reviewer: {
+    select: reviewerSelect,
+  },
+})
+
+export const getApplications = cache(async (): Promise<FullApplication[]> => {
   const session = await Session.get<UserSession>(cookies())
-  if (!session.ok) return null
+  if (!session.ok) return []
 
   if (session.value.role !== Role.Applicant) {
     const applications = await prisma.jobApplication.findMany({
-      include: {
-        listing: true,
-      },
+      include: applicationInclude,
     })
-    return applications
+    const users = await Promise.all(
+      applications.map(async (a) => {
+        ;(a.user as FullApplication['user']).age = age(await decrypt<string>(a.user.dob))
+        prisma.redact(a.user, ['taxId', 'password', 'dob'])
+        return a.user as User & { age: number }
+      })
+    )
+
+    return applications.map((a, i) => ({ ...a, user: users[i] }))
   }
 
   const userId = session.value.userId
   const applications = await prisma.jobApplication.findMany({
     where: { userId },
-    include: {
-      listing: true,
-    },
+    include: applicationInclude,
   })
 
-  return applications
+  const users = await Promise.all(
+    applications.map(async (a) => {
+      ;(a.user as FullApplication['user']).age = age(await decrypt<string>(a.user.dob))
+      prisma.redact(a.user, ['taxId', 'password', 'dob'])
+      return a.user as User & { age: number }
+    })
+  )
+
+  return applications.map((a, i) => ({ ...a, user: users[i] }))
 })
 
-/**
- * Retrieves a job application from the database by its ID.
- * - If the user is an applicant, only their applications are returned.
- * - If the user is not an applicant, all applications are returned.
- * @param id - The ID of the job application to retrieve.
- * @returns A promise that resolves to the retrieved job application, or null if the application is not found or the user is not authorized to view it.
- */
-export const getApplication = cache(async (id: string) => {
-  const session = await Session.get<UserSession>(cookies())
-  if (!session.ok) return null
+type ApplicationQuery = string | { listingId: string; userId: string }
 
-  const application = await prisma.jobApplication.findUnique({
-    where: { id },
-    include: {
-      listing: true,
-    },
-  })
+export const getApplication = cache(
+  async (query: ApplicationQuery): Promise<FullApplication | null> => {
+    const session = await Session.get<UserSession>(cookies())
+    if (!session.ok) return null
 
-  if (
-    !application ||
-    application.userId !== session.value.userId ||
-    session.value.role === Role.Applicant
-  ) {
-    return null
+    const application = await prisma.jobApplication.findUnique({
+      where: typeof query === 'string' ? { id: query } : { listingId_userId: query },
+      include: applicationInclude,
+      cacheStrategy: {
+        ttl: 60 * 60,
+        swr: 60 * 60,
+      },
+    })
+
+    const dob = application ? await decrypt<string>(application?.user.dob) : null
+
+    prisma.redact(application?.user, ['taxId', 'password', 'dob'])
+
+    if (
+      !application ||
+      (application.userId !== session.value.userId && session.value.role === Role.Applicant)
+    ) {
+      return null
+    }
+
+    return {
+      ...application,
+      user: {
+        ...application.user,
+        age: age(dob!),
+      },
+    }
   }
+)
 
-  return application
-})
-
-export const searchApplications = cache(async (searchTerm: string) => {
+export const searchApplications = cache(async (searchTerm: string): Promise<FullApplication[]> => {
   if (!searchTerm) return await getApplications()
 
   const session = await Session.get<UserSession>(cookies())
-  if (!session.ok) return null
+  if (!session.ok) return []
 
   let where: Prisma.JobApplicationWhereInput
 
@@ -90,10 +158,16 @@ export const searchApplications = cache(async (searchTerm: string) => {
         title: { search: `${searchTerm.replaceAll(' ', '+')}` },
       },
     },
-    include: {
-      listing: true,
-    },
+    include: applicationInclude,
   })
 
-  return applications
+  const users = await Promise.all(
+    applications.map(async (a) => {
+      ;(a.user as FullApplication['user']).age = age(await decrypt<string>(a.user.dob))
+      prisma.redact(a.user, ['taxId', 'password', 'dob'])
+      return a.user as User & { age: number }
+    })
+  )
+
+  return applications.map((a, i) => ({ ...a, user: users[i] }))
 })

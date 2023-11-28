@@ -1,13 +1,10 @@
 import Spinner from '@/_components/Spinner'
 import clsx from 'clsx'
-import React, { ComponentProps, JSXElementConstructor } from 'react'
+import Link from 'next/link'
+import React, { ComponentProps } from 'react'
 import styles from './Button.module.css'
 
-export type ButtonProps<As extends JSXElementConstructor<any> | keyof JSX.IntrinsicElements> = Omit<
-  ComponentProps<As>,
-  'color' | 'as'
-> & {
-  as: As
+interface CommonButtonProps {
   children: React.ReactNode
   minimal?: boolean
   color?: keyof typeof colors
@@ -16,7 +13,15 @@ export type ButtonProps<As extends JSXElementConstructor<any> | keyof JSX.Intrin
   small?: boolean
   disabled?: boolean
   unstyled?: boolean
+  className?: string
 }
+
+export interface ButtonProps
+  extends Omit<ComponentProps<'button'>, 'color' | 'as' | 'children'>,
+    CommonButtonProps {}
+export interface LinkButtonProps
+  extends Omit<ComponentProps<typeof Link>, 'color' | 'as' | 'children'>,
+    CommonButtonProps {}
 
 const colors = {
   primary: 'bg-navyblue-0 text-white shadow-md hover:brightness-125',
@@ -33,9 +38,8 @@ const minimalColors = {
   danger: 'text-red-800 hover:bg-red-600/20',
   warning: 'text-amber-800 hover:bg-amber-600/20',
 }
-export default function Button<
-  As extends JSXElementConstructor<any> | keyof JSX.IntrinsicElements = 'button'
->({
+
+export default function Button<Props extends CommonButtonProps = ButtonProps>({
   children,
   minimal,
   color,
@@ -43,16 +47,13 @@ export default function Button<
   loading,
   disabled,
   spinnerSize,
-  as,
   small = false,
   unstyled = false,
+  __element = 'button',
   ...props
-}: As extends 'button'
-  ? Omit<ButtonProps<As>, 'as'> & { as?: 'button' }
-  : ButtonProps<As>): JSX.Element {
-  const Element = as ?? 'button'
+}: Props & { __element?: any }) {
   return (
-    <Element
+    <__element
       disabled={loading || disabled}
       className={clsx(
         'z-0 relative',
@@ -80,6 +81,10 @@ export default function Button<
 
       {/* any child text needs to be wrapped in a span so that visibility:hidden hides it when spinner is shown */}
       {typeof children === 'string' ? <span>{children}</span> : children}
-    </Element>
+    </__element>
   )
+}
+
+export function LinkButton(props: LinkButtonProps) {
+  return <Button<LinkButtonProps> {...props} disabled={props.disabled} __element={Link} />
 }

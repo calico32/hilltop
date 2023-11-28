@@ -1,12 +1,9 @@
 import Button, { ButtonProps } from '@/_components/Button'
 
-function variant<const K extends keyof ButtonProps<'button'>>(
-  key: K,
-  values: ButtonProps<'button'>[K][]
-) {
+function variant<const K extends keyof ButtonProps>(key: K, values: ButtonProps[K][]) {
   return values.map((value) => ({
     [key]: value,
-  })) as { [key in K]: ButtonProps<'button'>[K] }[]
+  })) as { [key in K]: ButtonProps[K] }[]
 }
 
 function* combinations(variants: { [key: string]: any }[][]): Generator<{ [key: string]: any }> {

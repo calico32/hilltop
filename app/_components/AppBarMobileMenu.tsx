@@ -5,8 +5,7 @@ import Button from '@/_components/Button'
 import Logo from '@/_components/Logo'
 import NavLink from '@/_components/NavLink'
 import Spinner from '@/_components/Spinner'
-import { fullName } from '@/_lib/name'
-import { avatar } from '@/_util/avatar'
+import { avatar, fullName } from '@/_lib/format'
 import { Dialog, Transition } from '@headlessui/react'
 import clsx from 'clsx'
 import { LogOut, MenuIcon, X } from 'lucide-react'
@@ -35,17 +34,26 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
         pathname !== '/register' ? (
           <Link
             href="/register"
-            className="block px-4 py-2 ml-4 font-semibold text-white rounded-md bg-navyblue-0 hover:brightness-105"
+            className="block px-4 py-2 ml-4 mr-2 font-semibold text-white rounded-md bg-navyblue-0 hover:brightness-105"
           >
             Get started
           </Link>
         ) : (
-          <Link href="/login" className={clsx(landing ? '' : 'text-navyblue-0 font-semibold')}>
+          <Link href="/login" className={clsx(landing ? '' : 'text-navyblue-0 font-semibold mr-2')}>
             Sign in
           </Link>
         )
       ) : (
-        <></>
+        <Image
+          src={avatar(user)}
+          alt=""
+          width={32}
+          height={32}
+          className={clsx(
+            'self-center rounded-full mr-2',
+            landing ? 'shadow' : 'border-gray-400 border-2'
+          )}
+        />
       )}
       <button
         className="flex items-baseline justify-center rounded-md p-1.5 self-center"
@@ -83,7 +91,6 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
                     <Link href="/" className="self-center mr-4">
                       <Logo size={36} />
                     </Link>
-
                     <Link href="/">
                       <h1 className="font-serif text-2xl font-medium">Hilltop</h1>
                     </Link>
@@ -141,7 +148,7 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
                           loading={signingOut}
                           color="danger"
                           minimal
-                          className="flex items-center w-full px-4 py-2 text-base rounded-md shadow-none hover:bg-red-200"
+                          className="flex items-center w-full px-6 py-2 text-base rounded-md"
                           onClick={async () => {
                             setSigningOut(true)
                             const loading = toast.loading('Signing you out...')

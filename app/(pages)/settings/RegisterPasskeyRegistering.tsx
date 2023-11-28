@@ -1,5 +1,5 @@
 import api from '@/_api/client'
-import { RegisterPasskeyError } from '@/_api/types'
+import { PasskeyRegistrationError } from '@/_api/types'
 import Button from '@/_components/Button'
 import { Dialog } from '@headlessui/react'
 import { Loader2, X } from 'lucide-react'
@@ -70,32 +70,32 @@ async function register({ setStep, setFailureReason, setCredentialId }: Register
     if (!result.ok) {
       setStep(RegisterPasskeyStep.Failure)
       switch (result.error) {
-        case RegisterPasskeyError.ChallengeMismatch:
+        case PasskeyRegistrationError.ChallengeMismatch:
           setFailureReason(
             'The browser returned an invalid challenge response. Try registering your passkey again or using a different device.'
           )
           break
-        case RegisterPasskeyError.InvalidData:
+        case PasskeyRegistrationError.InvalidData:
           setFailureReason(
             'The browser returned an invalid response. Try registering your passkey again or using a different device.'
           )
           break
-        case RegisterPasskeyError.PasskeyExists:
+        case PasskeyRegistrationError.PasskeyExists:
           setFailureReason(
             'This passkey has already been registered. Try using a different device.'
           )
           break
-        case RegisterPasskeyError.ServerError:
+        case PasskeyRegistrationError.ServerError:
           setFailureReason(
             'The server encountered an error. Try registering your passkey again or using a different device.'
           )
           break
-        case RegisterPasskeyError.Unauthorized:
+        case PasskeyRegistrationError.Unauthorized:
           setFailureReason(
             'The server rejected the request. Try registering your passkey again or using a different device.'
           )
           break
-        case RegisterPasskeyError.UnsupportedDevice:
+        case PasskeyRegistrationError.UnsupportedDevice:
           setFailureReason(
             'Your device may not be supported. Try registering your passkey again or using a different device.'
           )

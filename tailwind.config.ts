@@ -1,4 +1,5 @@
 import headlessui from '@headlessui/tailwindcss'
+import typography from '@tailwindcss/typography'
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
@@ -37,6 +38,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [headlessui as any],
+  plugins: [headlessui as any, typography({ target: 'modern' })],
 }
 export default config

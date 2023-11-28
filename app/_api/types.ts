@@ -143,8 +143,8 @@ export const RegisterError = Enum(ActionError, {
 /**
  * Represents the possible errors that can occur during passkey registration.
  */
-export type RegisterPasskeyError = Enum<typeof RegisterPasskeyError>
-export const RegisterPasskeyError = Enum(ActionError, {
+export type PasskeyRegistrationError = Enum<typeof PasskeyRegistrationError>
+export const PasskeyRegistrationError = Enum(ActionError, {
   InvalidData: 'InvalidData',
   ChallengeMismatch: 'ChallengeMismatch',
   PasskeyExists: 'PasskeyExists',
@@ -241,4 +241,86 @@ export function parseRest(data: Buffer): [AttestedCredentialData, any] {
   }
 
   return [obj, extensions]
+}
+
+export interface CollectedClientData {
+  /**
+   * This member contains the string "webauthn.create" when creating new
+   * credentials, and "webauthn.get" when getting an assertion from an existing
+   * credential. The purpose of this member is to prevent certain types of
+   * signature confusion attacks (where an attacker substitutes one legitimate
+   * signature for another).
+   */
+  type: string
+  /**
+   * This member contains the base64url encoding of the challenge provided by
+   * the [Relying Party](https://w3c.github.io/webauthn/#relying-party). See the
+   * [§ 13.4.3 Cryptographic
+   * Challenges](https://w3c.github.io/webauthn/#sctn-cryptographic-challenges)
+   * security consideration.
+   */
+  challenge: string
+  /**
+   * This member contains the fully qualified origin of the requester, as
+   * provided to the authenticator by the client, in the syntax defined by
+   * [[RFC6454]](https://w3c.github.io/webauthn/#biblio-rfc6454).
+   */
+  origin: string
+  /**
+   * This OPTIONAL member contains the fully qualified top-level origin of the
+   * requester, in the syntax defined by
+   * [[RFC6454]](https://w3c.github.io/webauthn/#biblio-rfc6454). It is set only
+   * if the call was made from context that is not same-origin with its
+   * ancestors, i.e. if `crossOrigin` is true.
+   */
+  topOrigin?: string
+  crossOrigin?: boolean
+}
+
+export interface Attestation {
+  authData: Uint8Array
+  fmt: string
+  attStmt: {
+    sig: Uint8Array
+    x5c: Uint8Array[]
+  }
+}
+
+export interface PasskeyCreateOptions extends PublicKeyCredentialCreationOptions {
+  challengeId: string
+  expires: number
+}
+
+export interface PasskeyRegistrationData {
+  challengeId: string
+  /** `PublicKeyCredential#id` */
+  id: string
+  /** `PublicKeyCredential#type` */
+  type: string
+  /** `PublicKeyCredential#response.clientDataJSON` */
+  clientDataBuffer: Iterable<number>
+  /** `PublicKeyCredential#response.attestationObject` */
+  attestationObjectBuffer: Iterable<number>
+  /** `PublicKeyCredential#response.getTransports()` */
+  transports: string[]
+}
+
+export interface PasskeyRequestOptions extends PublicKeyCredentialRequestOptions {
+  challengeId: string
+}
+
+export interface PasskeyLoginData {
+  challengeId: string
+  /** `PublicKeyCredential#id` */
+  id: string
+  /** `PublicKeyCredential#type` */
+  type: string
+  /** `PublicKeyCredential#response.authenticatorData` */
+  authenticatorDataBuffer: Iterable<number>
+  /** `PublicKeyCredential#response.clientDataJSON` */
+  clientDataBuffer: Iterable<number>
+  /** `PublicKeyCredential#response.signature` */
+  signatureBuffer: Iterable<number>
+  /** `PublicKeyCredential#response.userHandle` */
+  userHandleBuffer?: Iterable<number> | null
 }

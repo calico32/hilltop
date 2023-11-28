@@ -1,8 +1,7 @@
 import ListingCard from '@/_components/ListingCard'
-import { JobListing } from '@prisma/client'
 
 export default async function Page(): Promise<JSX.Element> {
-  const listings: JobListing[] = []
+  const listings: any[] = []
 
   return (
     <>

@@ -1,4 +1,5 @@
-import { JobType } from '@prisma/client'
+import { ApplicationStatus, JobType } from '@prisma/client'
+import { Briefcase, Contact2, FolderClock, GraduationCap, LucideIcon } from 'lucide-react'
 
 export const states = {
   AL: 'Alabama',
@@ -59,3 +60,99 @@ export const jobTypes: Record<JobType, string> = {
   [JobType.Contract]: 'Contract',
   [JobType.Internship]: 'Internship',
 }
+
+export const jobIcons: Record<JobType, LucideIcon> = {
+  [JobType.FullTime]: Briefcase,
+  [JobType.PartTime]: FolderClock,
+  [JobType.Contract]: Contact2,
+  [JobType.Internship]: GraduationCap,
+}
+
+export const applicationStatuses: Record<ApplicationStatus, string> = {
+  [ApplicationStatus.Submitted]: 'Submitted',
+  [ApplicationStatus.InReview]: 'In Review',
+  [ApplicationStatus.Interviewing]: 'Interviewing',
+  [ApplicationStatus.Rejected]: 'Rejected',
+  [ApplicationStatus.Offered]: 'Offer Received',
+  [ApplicationStatus.Hired]: 'Hired',
+  [ApplicationStatus.Withdrawn]: 'Withdrawn',
+}
+
+export const applicationStatusColors: Record<ApplicationStatus, string> = {
+  [ApplicationStatus.Submitted]: 'border-blue-400 bg-blue-100 text-blue-700',
+  [ApplicationStatus.InReview]: 'border-blue-400 bg-blue-100 text-blue-700',
+  [ApplicationStatus.Interviewing]: 'border-blue-400 bg-blue-100 text-blue-700',
+  [ApplicationStatus.Rejected]: 'border-red-400 bg-red-100 text-red-700',
+  [ApplicationStatus.Offered]: 'border-cyan-400 bg-cyan-100 text-cyan-700',
+  [ApplicationStatus.Hired]: 'border-green-400 bg-green-100 text-green-700',
+  [ApplicationStatus.Withdrawn]: 'border-gray-400 bg-gray-100 text-gray-700',
+}
+
+export const mimeTypes: Record<string, string> = {
+  'application/pdf': 'PDF',
+  'application/msword': 'Word',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word',
+  'application/vnd.ms-excel': 'Excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel',
+  'application/vnd.ms-powerpoint': 'PowerPoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PowerPoint',
+  'text/plain': 'Text',
+  'application/zip': 'ZIP',
+  'application/x-rar-compressed': 'RAR',
+  'application/x-7z-compressed': '7z',
+  'image/jpeg': 'JPEG',
+  'image/png': 'PNG',
+  'image/gif': 'GIF',
+  'image/svg+xml': 'SVG',
+  'image/webp': 'WebP',
+  'video/mp4': 'MP4',
+  'video/mpeg': 'MPEG',
+  'video/ogg': 'OGG',
+  'video/webm': 'WebM',
+  'audio/mpeg': 'MP3',
+  'audio/ogg': 'OGG',
+  'audio/wav': 'WAV',
+  'audio/webm': 'WebM',
+  'application/vnd.oasis.opendocument.text': 'ODT',
+  'application/vnd.oasis.opendocument.spreadsheet': 'ODS',
+  'application/vnd.oasis.opendocument.presentation': 'ODP',
+  'application/vnd.oasis.opendocument.graphics': 'ODG',
+  'application/vnd.oasis.opendocument.chart': 'ODC',
+  'application/vnd.oasis.opendocument.database': 'ODB',
+  'application/vnd.oasis.opendocument.formula': 'ODF',
+  'application/vnd.oasis.opendocument.image': 'ODI',
+  'application/vnd.oasis.opendocument.text-master': 'ODM',
+}
+
+export const dangerousMimeTypes = [
+  'application/x-msdownload',
+  'application/x-msdos-program',
+  'application/zip',
+  // 'application/x-msi',
+  // 'application/x-ms-xbap',
+  // 'application/x-ms-xls',
+  // 'application/x-ms-xlsx',
+  // 'application/x-ms-xlw',
+  // 'application/x-msaccess',
+  // 'application/x-msbinder',
+  // 'application/x-mscardfile',
+  // 'application/x-msclip',
+  // 'application/x-msdownload',
+  // 'application/x-msmediaview',
+  // 'application/x-msmetafile',
+  // 'application/x-msmoney',
+  // 'application/x-mspublisher',
+  // 'application/x-msschedule',
+  // 'application/x-msterminal',
+  // 'application/x-mswrite',
+  // 'application/x-netcdf',
+  // 'application/x-perfmon',x
+]
+
+export const resumeAllowedMimeTypes = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.oasis.opendocument.text',
+  'text/plain',
+]

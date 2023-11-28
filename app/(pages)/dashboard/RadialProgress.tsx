@@ -16,7 +16,7 @@ export default function RadialProgress({ appNum, accepted }: RadialProgressProps
         height={halfCircle * 2}
         viewBox={`0 0 ${halfCircle * 2} ${halfCircle * 2}`}
       >
-        <g>
+        <g transform="rotate(270, 100, 100)">
           {/* <circle cx="6em" cy="6em" strokeWidth="1em" r="4em" fill="white" stroke="red" /> */}
           <circle
             cx="50%"
@@ -27,6 +27,7 @@ export default function RadialProgress({ appNum, accepted }: RadialProgressProps
             stroke="#00843d"
             strokeDasharray={circleCircumference}
             strokeDashoffset={0}
+            strokeLinecap="round"
           />
           <circle
             cx="50%"

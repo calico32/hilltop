@@ -13,8 +13,7 @@ datasource db {
 }
 
 model Department {
-  id String @id @default(uuid())
-
+  id   String @id @default(uuid())
   name String
 
   /// jobs in this department
@@ -26,25 +25,56 @@ model JobListing {
   created DateTime @default(now())
   updated DateTime @updatedAt
 
-  title String
-
-  departmentId String
-  department   Department @relation(fields: [departmentId], references: [id])
-
+  title            String
+  status           ListingStatus @default(Draft)
+  departmentId     String
+  department       Department    @relation(fields: [departmentId], references: [id])
   description      String
   requirements     String[]
   responsibilities String[]
   benefits         String[]
+  positions        Int
+  type             JobType
+  payType          PayType
+  payMin           Float
+  payMax           Float?
+  schedule         String
+  tags             String[]
 
-  positions Int
-  type      JobType
-  payType   PayType
-  payMin    Float
-  payMax    Float?
-  schedule  String
-  tags      String[]
-
+  questions    JobListingQuestion[]
+  answers      JobApplicationQuestion[]
   applications JobApplication[]
+}
+
+model JobListingQuestion {
+  listingId String
+  listing   JobListing   @relation(fields: [listingId], references: [id])
+  sequence  Int
+  question  String
+  required  Boolean
+  type      QuestionType
+  min       Int?
+  max       Int?
+
+  answers JobApplicationQuestion[]
+
+  @@id([listingId, sequence])
+}
+
+enum QuestionType {
+  ShortText
+  LongText
+  Number
+  Boolean
+  File
+  Select
+  MultiSelect
+}
+
+enum ListingStatus {
+  Draft
+  Active
+  Closed
 }
 
 enum PayType {
@@ -60,21 +90,48 @@ enum JobType {
 }
 
 model JobApplication {
-  id      String   @id @default(uuid())
-  created DateTime @default(now())
-  updated DateTime @updatedAt
+  id         String            @id @default(uuid())
+  created    DateTime          @default(now())
+  updated    DateTime          @updatedAt
+  listingId  String
+  listing    JobListing        @relation(fields: [listingId], references: [id])
+  userId     String
+  user       User              @relation("applicant", fields: [userId], references: [id])
+  status     ApplicationStatus @default(Submitted)
+  reviewerId String?
+  reviewer   User?             @relation("reviewier", fields: [reviewerId], references: [id])
+  resumeId   String?
+  resume     Storage?          @relation("resume", fields: [resumeId], references: [id])
 
-  listingId String
-  listing   JobListing @relation(fields: [listingId], references: [id])
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  status ApplicationStatus @default(Submitted)
-
-  resume Bytes?
+  questions JobApplicationQuestion[]
+  notes     JobApplicationNote[]
 
   @@unique([listingId, userId]) // one application per user per job
+}
+
+model JobApplicationNote {
+  id            String         @id @default(uuid())
+  created       DateTime       @default(now())
+  updated       DateTime       @updatedAt
+  authorId      String
+  author        User           @relation(fields: [authorId], references: [id])
+  applicationId String
+  application   JobApplication @relation(fields: [applicationId], references: [id])
+  body          String
+}
+
+model JobApplicationQuestion {
+  listingId String
+  listing   JobListing         @relation(fields: [listingId], references: [id])
+  sequence  Int
+  question  JobListingQuestion @relation(fields: [listingId, sequence], references: [listingId, sequence])
+
+  applicationId String
+  application   JobApplication @relation(fields: [applicationId], references: [id])
+
+  answer String
+
+  @@id([applicationId, sequence])
 }
 
 enum Role {
@@ -88,12 +145,16 @@ enum ApplicationStatus {
   Submitted
   /// application reviewed, waiting for decision
   InReview
+  /// application reviewed, waiting for interview
+  Interviewing
   /// application rejected
   Rejected
   /// application accepted, ready for hire
-  Accepted
+  Offered
   /// applicant hired
   Hired
+  /// application withdrawn
+  Withdrawn
 }
 
 model User {
@@ -106,35 +167,33 @@ model User {
   emailUpdates  Boolean  @default(false)
   role          Role     @default(Applicant)
   avatarId      String?
-  avatar        Storage? @relation(fields: [avatarId], references: [id])
-
+  avatar        Storage? @relation("avatar", fields: [avatarId], references: [id])
+  bio           String?
   /// hashed password
-  password String
-
+  password      String
   firstName     String
   middleInitial String?
   lastName      String
   preferredName String?
-
   /// encrypted date of birth
-  dob   String
+  dob           String
   /// encrypted SSN/TIN
-  taxId String
-
+  taxId         String
   /// phone number as xxxxxxxxxx
-  phone String?
-
-  address1 String
-  address2 String?
-  city     String
-  state    String
-  zip      String
-
+  phone         String?
+  address1      String
+  address2      String?
+  city          String
+  state         String
+  zip           String
   /// stored resume for applications
-  resume Bytes?
+  resumeId      String?
+  resume        Storage? @relation("resume", fields: [resumeId], references: [id])
 
-  applications JobApplication[]
-  passkeys     Passkey[]
+  applications       JobApplication[]     @relation("applicant")
+  reviews            JobApplication[]     @relation("reviewier")
+  passkeys           Passkey[]
+  JobApplicationNote JobApplicationNote[]
 }
 
 model Storage {
@@ -148,8 +207,12 @@ model Storage {
   type String
   /// file data
   data Bytes
+  /// file size in bytes
+  size Int
 
-  users User[]
+  avatar            User[]           @relation("avatar")
+  resume            User[]           @relation("resume")
+  applicationResume JobApplication[] @relation("resume")
 }
 
 model Passkey {

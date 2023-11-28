@@ -1,13 +1,45 @@
-import { ApplicationStatus, JobType, PayType, Prisma, PrismaClient, Role } from '@prisma/client'
+import {
+  ApplicationStatus,
+  JobType,
+  PayType,
+  Prisma,
+  PrismaClient,
+  QuestionType,
+  Role,
+} from '@prisma/client'
 import * as bcrypt from 'bcryptjs'
+import fs from 'fs/promises'
 import { encrypt } from 'kiyoi'
 import { v5 as uuidv5 } from 'uuid'
 
 const prisma = new PrismaClient()
 
+await prisma.$connect()
+
+await prisma.jobApplicationQuestion.deleteMany()
+await prisma.jobListingQuestion.deleteMany()
+
 const ns = '00000000-0000-0000-0000-000000000000'
 
 const id = (name: string) => uuidv5(name, ns)
+
+const bobAvatarData = await fs.readFile(__dirname + '/seed-assets/bob.png')
+const bobAvatar = await prisma.storage.upsert({
+  where: { id: id('bob-avatar') },
+  create: {
+    id: id('bob-avatar'),
+    name: 'bob.png',
+    type: 'image/png',
+    data: bobAvatarData,
+    size: bobAvatarData.length,
+  },
+  update: {
+    name: 'bob.png',
+    type: 'image/png',
+    data: bobAvatarData,
+    size: bobAvatarData.length,
+  },
+})
 
 const bob = {
   id: id('bob'),
@@ -16,6 +48,7 @@ const bob = {
   email: 'bob@example.org',
   emailVerified: true,
   password: await bcrypt.hash('password', 10),
+  avatarId: bobAvatar.id,
 
   address1: '123 Main St',
   address2: 'Apt 1',
@@ -355,6 +388,31 @@ const jobs: Record<string, Prisma.JobListingCreateInput> = {
         },
       },
     },
+    questions: {
+      createMany: {
+        data: [
+          {
+            sequence: 1,
+            question: 'What makes you a good fit for this position?',
+            required: true,
+            type: QuestionType.LongText,
+          },
+          {
+            sequence: 2,
+            question:
+              "Do you hold a bachelor's degree in social work, psychology, or a related field? If so, please list the degree and institution.",
+            required: false,
+            type: QuestionType.ShortText,
+          },
+          {
+            sequence: 3,
+            question: 'What is your favorite food?',
+            required: false,
+            type: QuestionType.ShortText,
+          },
+        ],
+      },
+    },
   },
 }
 
@@ -369,38 +427,107 @@ for (const [key, value] of Object.entries(jobs)) {
   })
 }
 
-const alice = {
+const aliceAvatarData = await fs.readFile(__dirname + '/seed-assets/alice.png')
+const aliceAvatar = await prisma.storage.upsert({
+  where: { id: id('alice-avatar') },
+  create: {
+    id: id('alice-avatar'),
+    name: 'alice.png',
+    type: 'image/png',
+    data: aliceAvatarData,
+    size: aliceAvatarData.length,
+  },
+  update: {
+    name: 'alice.png',
+    type: 'image/png',
+    data: aliceAvatarData,
+    size: aliceAvatarData.length,
+  },
+})
+
+const aliceResumeData = await fs.readFile(__dirname + '/seed-assets/resume.pdf')
+const aliceResume = await prisma.storage.upsert({
+  where: { id: id('alice-resume') },
+  create: {
+    id: id('alice-resume'),
+    name: 'resume.pdf',
+    type: 'application/pdf',
+    data: aliceResumeData,
+    size: aliceResumeData.length,
+  },
+  update: {
+    name: 'resume.pdf',
+    type: 'application/pdf',
+    data: aliceResumeData,
+    size: aliceResumeData.length,
+  },
+})
+const alice = Prisma.validator<
+  Prisma.XOR<Prisma.UserCreateInput, Prisma.UserUncheckedCreateInput>
+>()({
   id: id('alice'),
   firstName: 'Alice',
   lastName: 'Smith',
   email: 'alice@example.org',
   password: await bcrypt.hash('password', 10),
-
+  avatar: { connect: aliceAvatar },
+  resume: { connect: aliceResume },
   address1: '123 Main St',
   address2: 'Apt 1',
   city: 'Springfield',
   state: 'IL',
   zip: '12345',
+  bio: "Hey there! I'm Alice, and I'm a licensed social worker. I have 3 years of experience working with the elderly. I'm looking for a part-time position in the Springfield area. Looking forward to hearing from you!",
 
   dob: await encrypt('1990-01-01'),
   taxId: await encrypt('123-45-6789'),
 
   phone: '5555555555',
-
-  applications: {
-    connectOrCreate: {
-      where: { id: id('application1') },
-      create: {
-        id: id('application1'),
-        listingId: id('socialWorker'),
-        status: ApplicationStatus.InReview,
-      },
-    },
-  },
-}
+})
 
 await prisma.user.upsert({
   where: { id: id('alice') },
   create: alice,
   update: alice,
+})
+
+const application = Prisma.validator<
+  Prisma.XOR<Prisma.JobApplicationCreateInput, Prisma.JobApplicationUncheckedCreateInput>
+>()({
+  id: id('application1'),
+  user: { connect: { id: alice.id } },
+  listing: {
+    connect: { id: id('socialWorker') },
+  },
+  status: ApplicationStatus.InReview,
+  reviewer: { connect: bob },
+  resume: { connect: aliceResume },
+  questions: {
+    createMany: {
+      data: [
+        {
+          listingId: id('socialWorker'),
+          sequence: 1,
+          answer:
+            'I believe I am a strong fit for this position due to my extensive experience working with diverse populations and my deep commitment to helping individuals overcome challenges. My previous roles as a social worker have allowed me to develop strong assessment, intervention, and advocacy skills, which I am eager to apply in this role. Additionally, my empathy, active listening, and cultural competency enable me to establish meaningful connections with clients and provide them with the support they need to improve their lives.',
+        },
+        {
+          listingId: id('socialWorker'),
+          sequence: 2,
+          answer: "I hold a bachelor's degree in social work from the University of Illinois.",
+        },
+        {
+          listingId: id('socialWorker'),
+          sequence: 3,
+          answer: 'Pizza!',
+        },
+      ],
+    },
+  },
+})
+
+await prisma.jobApplication.upsert({
+  where: { id: application.id },
+  create: application,
+  update: application,
 })

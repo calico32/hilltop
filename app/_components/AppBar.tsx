@@ -32,10 +32,10 @@ export default async function AppBar({ landing }: AppBarProps) {
         </Link>
 
         <div className="hidden sm:contents">
-          <NavLink className="ml-6" href="/jobs">
+          <NavLink className="ml-8" href="/jobs">
             Search Jobs
           </NavLink>
-          <NavLink className="ml-6" href="/applications">
+          <NavLink className="ml-6" href="/applications" recruiterText="Review Applications">
             Your Applications
           </NavLink>
         </div>

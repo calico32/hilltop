@@ -2,14 +2,20 @@
 
 import {
   ActionError,
+  Attestation,
   AuthenticatorData,
+  CollectedClientData,
+  PasskeyCreateOptions,
+  PasskeyLoginData,
   PasskeyLoginError,
-  RegisterPasskeyError,
+  PasskeyRegistrationData,
+  PasskeyRegistrationError,
+  PasskeyRequestOptions,
 } from '@/_api/types'
 import { getRpId, verifySignature } from '@/_api/util'
 import { COSEAlgorithm } from '@/_lib/cose'
-import { prisma } from '@/_lib/database'
-import { fullName } from '@/_lib/name'
+import { caching, prisma } from '@/_lib/database'
+import { fullName } from '@/_lib/format'
 import { User } from '@prisma/client'
 import { decode as cborDecode } from 'cbor-x'
 import crypto from 'crypto'
@@ -19,20 +25,25 @@ import { cookies, headers } from 'next/headers'
 // Numbered statements in this section refer to the following section of the WebAuthn spec:
 // https://w3c.github.io/webauthn/#sctn-registering-a-new-credential
 
-export interface PasskeyCreateOptions extends PublicKeyCredentialCreationOptions {
-  challengeId: string
-  expires: number
-}
-
 export async function beginPasskeyRegistration(): Result.Async<
   PasskeyCreateOptions,
-  RegisterPasskeyError
+  PasskeyRegistrationError
 > {
   const session = await Session.get(cookies())
-  if (!session.ok) return Result.error(RegisterPasskeyError.Unauthorized)
+  if (!session.ok) return Result.error(PasskeyRegistrationError.Unauthorized)
 
-  const user = await prisma.user.findUnique({ where: { id: session.value.userId } })
-  if (!user) return Result.error(RegisterPasskeyError.Unauthorized)
+  const user = await prisma.user.findUnique({
+    where: { id: session.value.userId },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      preferredName: true,
+    },
+    cacheStrategy: caching.user,
+  })
+  if (!user) return Result.error(PasskeyRegistrationError.Unauthorized)
 
   // 1. Let options be a new PublicKeyCredentialCreationOptions structure
   //    configured to the Relying Party's needs for the ceremony.
@@ -83,70 +94,19 @@ export async function beginPasskeyRegistration(): Result.Async<
   return Result.ok(options)
 }
 
-interface CollectedClientData {
-  /**
-   * This member contains the string "webauthn.create" when creating new
-   * credentials, and "webauthn.get" when getting an assertion from an existing
-   * credential. The purpose of this member is to prevent certain types of
-   * signature confusion attacks (where an attacker substitutes one legitimate
-   * signature for another).
-   */
-  type: string
-  /**
-   * This member contains the base64url encoding of the challenge provided by
-   * the [Relying Party](https://w3c.github.io/webauthn/#relying-party). See the
-   * [§ 13.4.3 Cryptographic
-   * Challenges](https://w3c.github.io/webauthn/#sctn-cryptographic-challenges)
-   * security consideration.
-   */
-  challenge: string
-  /**
-   * This member contains the fully qualified origin of the requester, as
-   * provided to the authenticator by the client, in the syntax defined by
-   * [[RFC6454]](https://w3c.github.io/webauthn/#biblio-rfc6454).
-   */
-  origin: string
-  /**
-   * This OPTIONAL member contains the fully qualified top-level origin of the
-   * requester, in the syntax defined by
-   * [[RFC6454]](https://w3c.github.io/webauthn/#biblio-rfc6454). It is set only
-   * if the call was made from context that is not same-origin with its
-   * ancestors, i.e. if `crossOrigin` is true.
-   */
-  topOrigin?: string
-  crossOrigin?: boolean
-}
-
-interface Attestation {
-  authData: Uint8Array
-  fmt: string
-  attStmt: {
-    sig: Uint8Array
-    x5c: Uint8Array[]
-  }
-}
-
-export interface PasskeyRegistrationData {
-  challengeId: string
-  /** `PublicKeyCredential#id` */
-  id: string
-  /** `PublicKeyCredential#type` */
-  type: string
-  /** `PublicKeyCredential#response.clientDataJSON` */
-  clientDataBuffer: Iterable<number>
-  /** `PublicKeyCredential#response.attestationObject` */
-  attestationObjectBuffer: Iterable<number>
-  /** `PublicKeyCredential#response.getTransports()` */
-  transports: string[]
-}
-
 export async function registerPasskey(
   credential: PasskeyRegistrationData
-): Result.Async<void, RegisterPasskeyError> {
+): Result.Async<void, PasskeyRegistrationError> {
   const session = await Session.get(cookies())
   if (!session.ok) return Result.error(ActionError.Unauthorized)
 
-  const user = await prisma.user.findUnique({ where: { id: session.value.userId } })
+  const user = await prisma.user.findUnique({
+    where: { id: session.value.userId },
+    select: {
+      id: true,
+    },
+    cacheStrategy: caching.user,
+  })
   if (!user) return Result.error(ActionError.Unauthorized)
 
   // 5. Let [clientDataJSON] be the result of running UTF-8 decode on the value of
@@ -160,7 +120,7 @@ export async function registerPasskey(
 
   // 7. Verify that the value of [clientData].type is webauthn.create.
   if (clientData.type !== 'webauthn.create') {
-    return Result.error(RegisterPasskeyError.InvalidData)
+    return Result.error(PasskeyRegistrationError.InvalidData)
   }
 
   // 8. Verify that the value of [clientData].challenge equals the base64url encoding of
@@ -171,11 +131,11 @@ export async function registerPasskey(
   })
   if (!storedChallenge || storedChallenge.expires.getTime() < Date.now()) {
     await prisma.passkeyChallenge.deleteMany({ where: { id: credential.challengeId } })
-    return Result.error(RegisterPasskeyError.ChallengeMismatch)
+    return Result.error(PasskeyRegistrationError.ChallengeMismatch)
   }
   if (!challenge.equals(storedChallenge.challenge)) {
     await prisma.passkeyChallenge.deleteMany({ where: { id: credential.challengeId } })
-    return Result.error(RegisterPasskeyError.ChallengeMismatch)
+    return Result.error(PasskeyRegistrationError.ChallengeMismatch)
   }
   await prisma.passkeyChallenge.deleteMany({ where: { id: credential.challengeId } })
 
@@ -185,7 +145,7 @@ export async function registerPasskey(
     clientData.origin !== 'https://hilltop.works' &&
     clientData.origin !== 'http://localhost:3000'
   ) {
-    return Result.error(RegisterPasskeyError.InvalidData)
+    return Result.error(PasskeyRegistrationError.InvalidData)
   }
 
   // 10. If [clientData].topOrigin is present:
@@ -193,7 +153,7 @@ export async function registerPasskey(
     // 1. Verify that the Relying Party expects that this credential would have
     //    been created within an iframe that is not same-origin with its
     //    ancestors.
-    return Result.error(RegisterPasskeyError.InvalidData) // we do not allow cross-origin registration
+    return Result.error(PasskeyRegistrationError.InvalidData) // we do not allow cross-origin registration
   }
 
   // 11. Let hash be the result of computing a hash over response.clientDataJSON using SHA-256.
@@ -210,7 +170,7 @@ export async function registerPasskey(
   } = cborDecode(Buffer.from(Uint8Array.from(credential.attestationObjectBuffer))) as Attestation
   const authData = new AuthenticatorData(Buffer.from(authDataBuffer))
   if (!authData.attestedCredentialIncluded || !authData.attestedCredentialData)
-    return Result.error(RegisterPasskeyError.InvalidData)
+    return Result.error(PasskeyRegistrationError.InvalidData)
 
   // 13. Verify that the rpIdHash in authData is the SHA-256 hash of the RP ID
   //     expected by the Relying Party.
@@ -219,19 +179,19 @@ export async function registerPasskey(
     .update(Buffer.from(getRpId(headers())))
     .digest()
   if (!Buffer.from(authData.rpIdHash).equals(rpIdHash))
-    return Result.error(RegisterPasskeyError.InvalidData)
+    return Result.error(PasskeyRegistrationError.InvalidData)
 
   // 14. Verify that the UP bit of the flags in authData is set.
-  if (!authData.userPresent) return Result.error(RegisterPasskeyError.InvalidData)
+  if (!authData.userPresent) return Result.error(PasskeyRegistrationError.InvalidData)
 
   // 15. If the Relying Party requires user verification for this registration,
   //     verify that the UV bit of the flags in authData is set.
-  if (!authData.userVerified) return Result.error(RegisterPasskeyError.InvalidData)
+  if (!authData.userVerified) return Result.error(PasskeyRegistrationError.InvalidData)
 
   // 16. If the BE bit of the flags in authData is not set, verify that the BS
   //     bit is not set.
   if (!authData.backupEligible && authData.backupState)
-    return Result.error(RegisterPasskeyError.InvalidData)
+    return Result.error(PasskeyRegistrationError.InvalidData)
 
   // 17. If the Relying Party uses the credential’s backup eligibility to inform
   //     its user experience flows and/or policies, evaluate the BE bit of the
@@ -244,7 +204,7 @@ export async function registerPasskey(
   //     authData matches the alg attribute of one of the items in
   //     options.pubKeyCredParams.
   const alg = authData.attestedCredentialData.publicKey.alg
-  if (![-7, -8, -257].includes(alg)) return Result.error(RegisterPasskeyError.UnsupportedDevice)
+  if (![-7, -8, -257].includes(alg)) return Result.error(PasskeyRegistrationError.UnsupportedDevice)
 
   // 20. Verify that the values of the client extension outputs in
   //     clientExtensionResults and the authenticator extension outputs in the
@@ -290,7 +250,7 @@ export async function registerPasskey(
   //     than this many bytes SHOULD cause the RP to fail this registration
   //     ceremony.
   if (authData.attestedCredentialData?.credentialId.length > 1023)
-    return Result.error(RegisterPasskeyError.InvalidData)
+    return Result.error(PasskeyRegistrationError.InvalidData)
 
   // 26. Verify that the credentialId is not yet registered for any user. If the
   //     credentialId is already known then the Relying Party SHOULD fail this
@@ -300,7 +260,7 @@ export async function registerPasskey(
       credentialId: credential.id,
     },
   })
-  if (existingPasskey) return Result.error(RegisterPasskeyError.PasskeyExists)
+  if (existingPasskey) return Result.error(PasskeyRegistrationError.PasskeyExists)
 
   // 27. If the attestation statement attStmt verified successfully and is
   //     found to be trustworthy, then create and store a new credential record
@@ -329,10 +289,6 @@ export async function registerPasskey(
   return Result.ok()
 }
 
-export interface PasskeyRequestOptions extends PublicKeyCredentialRequestOptions {
-  challengeId: string
-}
-
 // Numbered statements after this line refer to the following section of the WebAuthn spec:
 // https://w3c.github.io/webauthn/#sctn-verifying-assertion
 
@@ -342,7 +298,13 @@ export async function beginPasskeyTest(
   const session = await Session.get(cookies())
   if (!session.ok) return Result.error(ActionError.Unauthorized)
 
-  const user = await prisma.user.findUnique({ where: { id: session.value.userId } })
+  const user = await prisma.user.findUnique({
+    where: { id: session.value.userId },
+    select: {
+      id: true,
+    },
+    cacheStrategy: caching.user,
+  })
   if (!user) return Result.error(ActionError.Unauthorized)
 
   const passkey = await prisma.passkey.findUnique({
@@ -380,22 +342,6 @@ export async function beginPasskeyTest(
   return Result.ok(options)
 }
 
-export interface PasskeyLoginData {
-  challengeId: string
-  /** `PublicKeyCredential#id` */
-  id: string
-  /** `PublicKeyCredential#type` */
-  type: string
-  /** `PublicKeyCredential#response.authenticatorData` */
-  authenticatorDataBuffer: Iterable<number>
-  /** `PublicKeyCredential#response.clientDataJSON` */
-  clientDataBuffer: Iterable<number>
-  /** `PublicKeyCredential#response.signature` */
-  signatureBuffer: Iterable<number>
-  /** `PublicKeyCredential#response.userHandle` */
-  userHandleBuffer?: Iterable<number> | null
-}
-
 export async function testPasskey(
   credential: PasskeyLoginData
 ): Result.Async<void, PasskeyLoginError> {
@@ -408,7 +354,13 @@ export async function testPasskey(
   const session = await Session.get(cookies())
   if (!session.ok) return Result.error(PasskeyLoginError.Unauthorized)
 
-  const user = await prisma.user.findUnique({ where: { id: session.value.userId } })
+  const user = await prisma.user.findUnique({
+    where: { id: session.value.userId },
+    select: {
+      id: true,
+    },
+    cacheStrategy: caching.user,
+  })
   if (!user) return Result.error(PasskeyLoginError.Unauthorized)
 
   if (credential.userHandleBuffer) {
@@ -643,9 +595,15 @@ export async function passkeyLogin(
   let user
   if (credential.userHandleBuffer) {
     const userHandle = Buffer.from(Uint8Array.from(credential.userHandleBuffer)).toString('utf8')
-    user = await prisma.user.findUnique({ where: { id: userHandle } })
+    user = await prisma.user.findUnique({
+      where: { id: userHandle },
+      cacheStrategy: caching.user,
+    })
   } else {
-    user = await prisma.user.findUnique({ where: { id: passkey.userId } })
+    user = await prisma.user.findUnique({
+      where: { id: passkey.userId },
+      cacheStrategy: caching.user,
+    })
   }
 
   if (!user) return Result.error(PasskeyLoginError.Unauthorized)
@@ -858,7 +816,13 @@ export async function nicknamePasskey(
   const session = await Session.get(cookies())
   if (!session.ok) return Result.error(ActionError.Unauthorized)
 
-  const user = await prisma.user.findUnique({ where: { id: session.value.userId } })
+  const user = await prisma.user.findUnique({
+    where: { id: session.value.userId },
+    select: {
+      id: true,
+    },
+    cacheStrategy: caching.user,
+  })
   if (!user) return Result.error(ActionError.Unauthorized)
 
   await prisma.passkey.update({
@@ -886,7 +850,11 @@ export async function getPasskeys(): Promise<
   const session = await Session.get(cookies())
   if (!session.ok) return []
 
-  const user = await prisma.user.findUnique({ where: { id: session.value.userId } })
+  const user = await prisma.user.findUnique({
+    where: { id: session.value.userId },
+    select: { id: true },
+    cacheStrategy: caching.user,
+  })
   if (!user) return []
 
   const passkeys = await prisma.passkey.findMany({
@@ -912,7 +880,11 @@ export async function deletePasskey(credentialId: string) {
   const session = await Session.get(cookies())
   if (!session.ok) return Result.error(ActionError.Unauthorized)
 
-  const user = await prisma.user.findUnique({ where: { id: session.value.userId } })
+  const user = await prisma.user.findUnique({
+    where: { id: session.value.userId },
+    select: { id: true },
+    cacheStrategy: caching.user,
+  })
   if (!user) return Result.error(ActionError.Unauthorized)
 
   await prisma.passkey.delete({
