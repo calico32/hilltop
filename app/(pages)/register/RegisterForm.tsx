@@ -487,6 +487,7 @@ export default function RegisterForm(): JSX.Element {
         <Button
           type="submit"
           color="primary"
+          large
           loading={isSubmitting}
           className="col-start-1 col-span-2 w-max mx-auto mt-8 text-lg hover:brightness-110"
           disabled={isSubmitting}

@@ -88,6 +88,8 @@ export default function ApplicationCard({
             <p key={req}>{req}</p>
           ))}
 
+          <div className="flex-1" />
+
           <LinkButton
             href={`/applications/${application.id}`}
             small

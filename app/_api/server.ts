@@ -1,4 +1,11 @@
-import { getApplication, getApplications, searchApplications } from '@/_api/applications'
+import {
+  addApplicationNote,
+  deleteApplicationNote,
+  getApplication,
+  getApplicationNotes,
+  getApplications,
+  searchApplications,
+} from '@/_api/applications'
 import {
   forgotPassword,
   isPasswordResetTokenValid,
@@ -77,6 +84,18 @@ const server = {
    * applicant, all applications are returned.
    */
   searchApplications,
+  /**
+   * Retrieve notes for a job application.
+   */
+  getApplicationNotes,
+  /**
+   * Add a note to a job application.
+   */
+  addApplicationNote,
+  /**
+   * Delete a note from a job application.
+   */
+  deleteApplicationNote,
   /**
    * Retrieve job listings from the database.
    * - If the user is an applicant, only active listings are returned.

@@ -31,7 +31,7 @@ export default async function Page({ params }: { params: { id: string } }): Prom
               href={`/jobs/${params.id}/apply`}
               className="w-full hover:!brightness-100 opacity-50"
               color="primary"
-              disabled={!!application}
+              disabled={!!(currentUser && !!application)}
             >
               Apply now
             </LinkButton>

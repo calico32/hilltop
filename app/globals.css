@@ -24,11 +24,27 @@
   .bleed-full {
     grid-column: 1 / -1;
   }
+
+  .hover-target {
+    @apply block;
+  }
+
+  .hover-subject {
+    @apply opacity-0 transition;
+  }
+
+  .hover-target:hover .hover-subject {
+    @apply opacity-75;
+  }
+
+  .hover-subject:hover {
+    @apply opacity-100;
+  }
 }
 
 .app-bar {
   transform: translateY(0);
-  transition: transform 100ms ease-in-out;
+  transition: transform 150ms ease-in-out;
 }
 
 .app-bar-hidden {

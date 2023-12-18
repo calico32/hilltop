@@ -26,7 +26,16 @@ export default function LoginForm(): JSX.Element {
   } = form
 
   const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
+    // instead of:
+    // const response = await fetch('/api/login', { method: 'POST',        body: JSON.stringify(data) })
+    //                               ^ not type-safe        ^ not type-safe      ^ not type-safe
+    // const result = await response.json()
+    //                      ^ not type-safe, can throw errors
+
+    // we can do:
     const result = await api.login(data.email, data.password)
+    //    ^ Result<User, LoginError>
+
     if (!result.ok) {
       switch (result.error) {
         case LoginError.ServerError:
@@ -62,7 +71,7 @@ export default function LoginForm(): JSX.Element {
         }}
       >
         <KeyRound strokeWidth={1.5} />
-        Sign in with Passkey
+        <span>Sign in with Passkey</span>
       </Button>
       {passkeyError && <p className="text-red-600 -mt-2">{passkeyError}</p>}
       <div className="flex items-center w-full gap-2">
@@ -98,6 +107,7 @@ export default function LoginForm(): JSX.Element {
 
           <Button
             loading={isSubmitting}
+            large
             color="accent"
             type="submit"
             className="self-center p-3 px-10 mt-2 text-xl font-semibold rounded-md w-max"
@@ -169,37 +179,35 @@ async function passkeyLogin({
       switch (result.error) {
         case PasskeyLoginError.ChallengeMismatch:
           setPasskeyError(
-            'The browser returned an invalid challenge response. Try registering your passkey again or using a different device.'
+            'The browser returned an invalid challenge response. Try again or using a different device.'
           )
           break
         case PasskeyLoginError.InvalidData:
           setPasskeyError(
-            'The browser returned an invalid response. Try registering your passkey again or using a different device.'
+            'The browser returned an invalid response. Try again or using a different device.'
           )
           break
         case PasskeyLoginError.PasskeyNotFound:
           setPasskeyError(
-            'The browser returned an invalid credential. Try registering your passkey again or using a different device.'
+            'The browser returned an invalid credential. Try again or using a different device.'
           )
           break
         case PasskeyLoginError.ServerError:
-          setPasskeyError(
-            'The server encountered an error. Try registering your passkey again or using a different device.'
-          )
+          setPasskeyError('The server encountered an error. Try again or using a different device.')
           break
         case PasskeyLoginError.Unauthorized:
           setPasskeyError(
-            'The server rejected your passkey. Try registering your passkey again or using a different device.'
+            'The server rejected your passkey. Try again or using a different device.'
           )
           break
         case PasskeyLoginError.UnsupportedDevice:
           setPasskeyError(
-            'Your device may not be supported. Try registering your passkey again or using a different device.'
+            'Your device may not be supported. Try again or using a different device.'
           )
           break
         case PasskeyLoginError.VerificationFailed:
           setPasskeyError(
-            'The credential could not prove its authenticity. Try registering your passkey again or using a different device.'
+            'The credential could not prove its authenticity. Try again or using a different device.'
           )
           break
       }
@@ -216,11 +224,11 @@ async function passkeyLogin({
     if (!(err instanceof DOMException)) return
     if (err.name === 'InvalidStateError') {
       setPasskeyError(
-        'The browser reported an invalid state error. Try registering your passkey again or using a different device.'
+        'The browser reported an invalid state error. Try again or using a different device.'
       )
     } else if (err.name === 'NotAllowedError') {
       setPasskeyError(
-        'The operation timed out or the browser denied access to the authenticator. Try registering your passkey again or using a different device.'
+        'The operation timed out or the browser denied access to the authenticator. Try again or using a different device.'
       )
     } else {
       setPasskeyError(err.message)

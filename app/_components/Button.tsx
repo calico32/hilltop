@@ -7,10 +7,12 @@ import styles from './Button.module.css'
 interface CommonButtonProps {
   children: React.ReactNode
   minimal?: boolean
+  outlined?: boolean
   color?: keyof typeof colors
   loading?: boolean
   spinnerSize?: number
   small?: boolean
+  large?: boolean
   disabled?: boolean
   unstyled?: boolean
   className?: string
@@ -39,15 +41,25 @@ const minimalColors = {
   warning: 'text-amber-800 hover:bg-amber-600/20',
 }
 
+const outlinedColors = {
+  primary: 'text-navyblue-0 border border-navyblue-0 hover:bg-navyblue-0/10',
+  accent: 'text-emeraldgreen-1 border border-emeraldgreen-1 hover:bg-emeraldgreen-1/10',
+  neutral: 'text-gray-600 border border-gray-600 hover:bg-gray-500/10',
+  danger: 'text-red-800 border border-red-800 hover:bg-red-600/10',
+  warning: 'text-amber-800 border border-amber-800 hover:bg-amber-600/10',
+}
+
 export default function Button<Props extends CommonButtonProps = ButtonProps>({
   children,
   minimal,
+  outlined,
   color,
   className,
   loading,
   disabled,
   spinnerSize,
   small = false,
+  large = false,
   unstyled = false,
   __element = 'button',
   ...props
@@ -61,8 +73,14 @@ export default function Button<Props extends CommonButtonProps = ButtonProps>({
           ? ''
           : clsx(
               'w-max font-semibold rounded-md',
-              minimal ? minimalColors[color ?? 'primary'] : colors[color ?? 'primary'],
-              small ? 'py-3 px-7' : 'py-4 px-10'
+              outlined
+                ? outlinedColors[color ?? 'primary']
+                : minimal
+                ? minimalColors[color ?? 'primary']
+                : colors[color ?? 'primary'],
+              large ? 'py-4 px-10' : small ? 'px-5 py-2.5 text-sm' : 'py-3 px-7',
+              disabled && 'opacity-50',
+              loading && 'opacity-75'
               // minimal && 'hover:shadow-md hover:ring-1'
             ),
         className,
@@ -70,6 +88,7 @@ export default function Button<Props extends CommonButtonProps = ButtonProps>({
         loading && styles.loading,
         loading || disabled ? 'cursor-not-allowed' : unstyled ? '' : ''
       )}
+      onClick={'onClick' in props ? (loading || disabled ? undefined : props.onClick) : undefined}
       {...props}
     >
       {loading && (

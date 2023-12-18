@@ -1,6 +1,7 @@
 import {
   ApplicationStatus,
   JobType,
+  ListingStatus,
   PayType,
   Prisma,
   PrismaClient,
@@ -16,8 +17,18 @@ const prisma = new PrismaClient()
 
 await prisma.$connect()
 
-await prisma.jobApplicationQuestion.deleteMany()
-await prisma.jobListingQuestion.deleteMany()
+await prisma.$transaction([
+  prisma.jobApplicationQuestion.deleteMany(),
+  prisma.jobListingQuestion.deleteMany(),
+  prisma.jobApplicationNote.deleteMany(),
+  prisma.jobApplication.deleteMany(),
+  prisma.jobListing.deleteMany(),
+  prisma.passkeyChallenge.deleteMany(),
+  prisma.passkey.deleteMany(),
+  prisma.user.deleteMany(),
+  prisma.storage.deleteMany(),
+  prisma.department.deleteMany(),
+])
 
 const ns = '00000000-0000-0000-0000-000000000000'
 
@@ -421,6 +432,7 @@ for (const [key, value] of Object.entries(jobs)) {
     where: { id: id(key) },
     create: {
       id: id(key),
+      status: ListingStatus.Active,
       ...value,
     },
     update: value,
@@ -521,6 +533,28 @@ const application = Prisma.validator<
           sequence: 3,
           answer: 'Pizza!',
         },
+      ],
+    },
+  },
+  notes: {
+    createMany: {
+      data: [
+        {
+          // manually set the created date to 1 week ago so we can test the sorting
+          created: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
+          authorId: bob.id,
+          body: 'This applicant looks like a good fit. I recommend moving them to the next stage.',
+        },
+        {
+          authorId: bob.id,
+          body: 'Hi Bob! I love your videos! I am a huge fan!',
+        },
+        // create a lot more notes
+        ...Array.from({ length: 15 }).map((_, i) => ({
+          created: new Date(Date.now() - 1000 * 60 * 60 * 24 * (i + 1)),
+          authorId: bob.id,
+          body: `This is note #${i + 1}`,
+        })),
       ],
     },
   },

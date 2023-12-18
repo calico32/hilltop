@@ -19,7 +19,8 @@ export async function middleware(req: NextRequest) {
     path.startsWith('/applications') ||
     path.startsWith('/dashboard') ||
     path.startsWith('/profile') ||
-    path.startsWith('/settings')
+    path.startsWith('/settings') ||
+    /^\/jobs\/[a-z0-9-]+\/.+/i.test(path)
   ) {
     if (!result.ok) {
       res = NextResponse.redirect(new URL('/login?next=' + encodeURIComponent(path), req.url))

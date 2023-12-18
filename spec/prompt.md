@@ -37,7 +37,7 @@ somewhere with a lot of different kinds of jobs
 - white #ffffff
 - gray #ededed
 
-- serif: Sutro → Roboto Serif
+- serif: Sutro → Lora
 - sans: Proxima Nova → Figtree
 
 ## FEATURES

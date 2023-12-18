@@ -73,19 +73,29 @@ export const applicationStatuses: Record<ApplicationStatus, string> = {
   [ApplicationStatus.InReview]: 'In Review',
   [ApplicationStatus.Interviewing]: 'Interviewing',
   [ApplicationStatus.Rejected]: 'Rejected',
-  [ApplicationStatus.Offered]: 'Offer Received',
+  [ApplicationStatus.Offered]: 'Offered',
   [ApplicationStatus.Hired]: 'Hired',
   [ApplicationStatus.Withdrawn]: 'Withdrawn',
 }
 
 export const applicationStatusColors: Record<ApplicationStatus, string> = {
-  [ApplicationStatus.Submitted]: 'border-blue-400 bg-blue-100 text-blue-700',
-  [ApplicationStatus.InReview]: 'border-blue-400 bg-blue-100 text-blue-700',
+  [ApplicationStatus.Submitted]: 'border-cyan-400 bg-cyan-100 text-cyan-700',
+  [ApplicationStatus.InReview]: 'border-sky-400 bg-sky-100 text-sky-700',
   [ApplicationStatus.Interviewing]: 'border-blue-400 bg-blue-100 text-blue-700',
+  [ApplicationStatus.Offered]: 'border-indigo-400 bg-indigo-100 text-indigo-700',
   [ApplicationStatus.Rejected]: 'border-red-400 bg-red-100 text-red-700',
-  [ApplicationStatus.Offered]: 'border-cyan-400 bg-cyan-100 text-cyan-700',
   [ApplicationStatus.Hired]: 'border-green-400 bg-green-100 text-green-700',
   [ApplicationStatus.Withdrawn]: 'border-gray-400 bg-gray-100 text-gray-700',
+}
+
+export const applicationStatusSelectedColors: Record<ApplicationStatus, string> = {
+  [ApplicationStatus.Submitted]: 'border-cyan-400 bg-cyan-600 text-cyan-100',
+  [ApplicationStatus.InReview]: 'border-sky-400 bg-sky-600 text-sky-100',
+  [ApplicationStatus.Interviewing]: 'border-blue-400 bg-blue-600 text-blue-100',
+  [ApplicationStatus.Offered]: 'border-indigo-400 bg-indigo-600 text-indigo-100',
+  [ApplicationStatus.Rejected]: 'border-red-400 bg-red-600 text-red-100',
+  [ApplicationStatus.Hired]: 'border-green-400 bg-green-600 text-green-100',
+  [ApplicationStatus.Withdrawn]: 'border-gray-400 bg-gray-600 text-gray-100',
 }
 
 export const mimeTypes: Record<string, string> = {

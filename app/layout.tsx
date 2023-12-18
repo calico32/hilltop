@@ -1,4 +1,3 @@
-import Footer from '@/_components/Footer'
 import { Analytics } from '@vercel/analytics/react'
 import clsx from 'clsx'
 import type { Metadata } from 'next'
@@ -22,10 +21,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={clsx(serif.variable, sans.variable, 'font-sans wrapper')}>
+      <body className={clsx(serif.variable, sans.variable, 'font-sans min-h-screen')}>
         <Toaster position="top-center" />
-        {children}
-        <Footer />
+        <div className="wrapper">{children}</div>
         <Analytics />
       </body>
     </html>

@@ -16,7 +16,9 @@ import resolveConfig from 'tailwindcss/resolveConfig'
 import config from '../tailwind.config'
 
 const baseUrl =
-  process.env.BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3000'
+    : process.env.BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')
 
 export default function VerifyEmail({
   token = nanoid(),
@@ -39,8 +41,21 @@ export default function VerifyEmail({
         >
           <Section>
             <Container className="mx-auto pt-5 pb-12 w-[580px]">
-              <Section>
-                <Img src={`${baseUrl}/logo.png`} width="96" height="30" alt="Hilltop" />
+              <Section className="mb-8">
+                <Img
+                  src={`${baseUrl}/logo-light.png`}
+                  className="block dark:hidden"
+                  width="84"
+                  height="66"
+                  alt="Hilltop"
+                />
+                <Img
+                  src={`${baseUrl}/logo-dark.png`}
+                  className="dark:block hidden"
+                  width="84"
+                  height="66"
+                  alt="Hilltop"
+                />
               </Section>
               {/* <Section>
               <Img

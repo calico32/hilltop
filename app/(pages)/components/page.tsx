@@ -1,9 +1,23 @@
 import Button, { ButtonProps } from '@/_components/Button'
 
-function variant<const K extends keyof ButtonProps>(key: K, values: ButtonProps[K][]) {
-  return values.map((value) => ({
+function variant<K extends keyof ButtonProps>(
+  key: K,
+  values: ButtonProps[K][]
+): Partial<ButtonProps>[]
+function variant(values: Partial<ButtonProps>[]): Partial<ButtonProps>[]
+function variant(key: string | Partial<ButtonProps>[], values?: any): Partial<ButtonProps>[] {
+  if (Array.isArray(key)) {
+    return key
+  }
+  return values.map((value: any) => ({
     [key]: value,
-  })) as { [key in K]: ButtonProps[K] }[]
+  }))
+}
+
+function chunks<E extends unknown>(arr: E[], size: number): E[][] {
+  return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+    arr.slice(i * size, i * size + size)
+  )
 }
 
 function* combinations(variants: { [key: string]: any }[][]): Generator<{ [key: string]: any }> {
@@ -26,22 +40,28 @@ function* combinations(variants: { [key: string]: any }[][]): Generator<{ [key: 
 
 export default function Page(): JSX.Element {
   const color = variant('color', ['primary', 'accent', 'danger', 'warning', 'neutral'])
-  const minimal = variant('minimal', [false, true])
-  const loading = variant('loading', [false, true])
-  const small = variant('small', [false, true])
-  const variants = [color, minimal, small, loading]
+  const style = variant([{}, { outlined: true }, { minimal: true }])
+  const size = variant([{ large: true }, {}, { small: true }])
+  const state = variant([{}, { loading: true }, { disabled: true }])
+  const variants = [color, style, size, state]
 
-  const c = Array.from(combinations(variants))
+  const grid = chunks(Array.from(combinations(variants)), 9)
 
   return (
     <>
-      <div className="grid grid-cols-4 gap-4">
-        {c.map((props, i) => (
-          <div key={i}>
-            <Button {...props}>Button</Button>
-          </div>
-        ))}
-      </div>
+      <table className="!bleed-half table-auto">
+        <tbody>
+          {grid.map((row, i) => (
+            <tr key={i} className="">
+              {row.map((props, j) => (
+                <td key={j} className="py-2 align-middle">
+                  <Button {...props}>Button</Button>
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </>
   )
 }

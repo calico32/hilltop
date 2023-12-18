@@ -28,7 +28,7 @@ export default function NavLink({
   let content = children
   if (adminText && user?.role === Role.Admin) {
     content = adminText
-  } else if (recruiterText && user?.role !== Role.Applicant) {
+  } else if (recruiterText && user && user?.role !== Role.Applicant) {
     content = recruiterText
   }
 
@@ -36,8 +36,8 @@ export default function NavLink({
     <Link
       href={href}
       className={clsx(
-        'pb-1.5',
-        'hover:text-gray-900  dark:hover:text-white border-b-4',
+        'pb-0.5',
+        'hover:text-gray-900 dark:hover:text-white border-b-4 drop-shadow-xl',
         path === href
           ? 'text-black dark:text-white font-medium border-black dark:border-white'
           : 'text-gray-600 dark:text-gray-300 border-transparent',

@@ -2,26 +2,30 @@ import { PayType, User } from '@prisma/client'
 import MD5 from 'md5.js'
 import { FormatEnum } from 'sharp'
 
-export function displayName(user: User | null) {
-  if (!user) return null
+export function displayName<T extends Pick<User, 'preferredName' | 'firstName'> | null>(
+  user: T
+): T extends null ? null : string {
+  if (!user) return null as any
   if (user.preferredName) {
-    return user.preferredName.split(' ')[0]
+    return user.preferredName.split(' ')[0] as any
   }
 
-  return user.firstName
+  return user.firstName as any
 }
 
-export function fullName(user: Pick<User, 'preferredName' | 'firstName' | 'lastName'> | null) {
-  if (!user) return null
+export function fullName<T extends Pick<User, 'preferredName' | 'firstName' | 'lastName'> | null>(
+  user: T
+): T extends null ? null : string {
+  if (user === null) return null as any
   if (user.preferredName) {
     if (user.preferredName.split(' ').length > 1) {
-      return user.preferredName
+      return user.preferredName as any
     }
 
-    return `${user.preferredName} ${user.lastName}`
+    return `${user.preferredName} ${user.lastName}` as any
   }
 
-  return `${user.firstName} ${user.lastName}`
+  return `${user.firstName} ${user.lastName}` as any
 }
 
 export function age(dob: Date | string) {
@@ -44,8 +48,8 @@ export function avatar(
   return gravatar(user.email)
 }
 
-export function phoneNumber(phone: string | null) {
-  return phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')
+export function phoneNumber<T extends string | null>(phone: T): T extends null ? null : string {
+  return phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3') as any
 }
 
 export function taxId(taxId: string | null) {

@@ -2,12 +2,15 @@
 
 import { cache } from 'react'
 
-import { UserSession } from '@/_api/types'
+import { ActionError, UserSession } from '@/_api/types'
 import { prisma } from '@/_lib/database'
+import { sendEmail } from '@/_lib/email'
 import { age } from '@/_lib/format'
 import {
+  ApplicationStatus,
   Department,
   JobApplication,
+  JobApplicationNote,
   JobApplicationQuestion,
   JobListing,
   JobListingQuestion,
@@ -16,8 +19,9 @@ import {
   Storage,
   User,
 } from '@prisma/client'
-import { Session, decrypt } from 'kiyoi'
+import { Result, Session, decrypt } from 'kiyoi'
 import { cookies } from 'next/headers'
+import ApplicationRejected from '../../emails/ApplicationRejected'
 
 export type FullApplication = JobApplication & {
   listing: JobListing & {
@@ -26,12 +30,15 @@ export type FullApplication = JobApplication & {
     questions: JobListingQuestion[]
   }
   questions: JobApplicationQuestion[]
+  notes: (JobApplicationNote & {
+    author: Pick<User, 'firstName' | 'lastName' | 'preferredName' | 'avatarId' | 'email'>
+  })[]
   user: User & { age: number }
   reviewer?: Pick<User, 'firstName' | 'lastName' | 'preferredName' | 'avatarId' | 'email'> | null
   resume: Pick<Storage, 'name' | 'type' | 'size' | 'id'> | null
 }
 
-const reviewerSelect = Prisma.validator<Prisma.UserSelect>()({
+const userSelect = Prisma.validator<Prisma.UserSelect>()({
   firstName: true,
   lastName: true,
   preferredName: true,
@@ -48,6 +55,13 @@ const applicationInclude = Prisma.validator<Prisma.JobApplicationInclude>()({
     },
   },
   questions: true,
+  notes: {
+    include: {
+      author: {
+        select: userSelect,
+      },
+    },
+  },
   resume: {
     select: {
       name: true,
@@ -58,7 +72,7 @@ const applicationInclude = Prisma.validator<Prisma.JobApplicationInclude>()({
   },
   user: true,
   reviewer: {
-    select: reviewerSelect,
+    select: userSelect,
   },
 })
 
@@ -171,3 +185,125 @@ export const searchApplications = cache(async (searchTerm: string): Promise<Full
 
   return applications.map((a, i) => ({ ...a, user: users[i] }))
 })
+
+export async function getApplicationNotes(
+  applicationId: string
+): Promise<FullApplication['notes']> {
+  const session = await Session.get<UserSession>(cookies())
+  if (!session.ok) return []
+
+  const application = await prisma.jobApplication.findUnique({
+    where: { id: applicationId },
+    include: {
+      notes: applicationInclude.notes,
+    },
+  })
+
+  if (!application) return []
+  if (application.userId !== session.value.userId && session.value.role === Role.Applicant)
+    return []
+
+  return application.notes
+}
+
+export async function addApplicationNote(
+  applicationId: string,
+  body: string
+): Result.Async<JobApplicationNote, ActionError> {
+  const session = await Session.get<UserSession>(cookies())
+  if (!session.ok) return Result.error(ActionError.Unauthorized)
+
+  const userId = session.value.userId
+
+  const application = await prisma.jobApplication.findUnique({
+    where: { id: applicationId },
+  })
+
+  if (!application) return Result.error(ActionError.NotFound)
+  if (application.userId !== userId && session.value.role === Role.Applicant)
+    return Result.error(ActionError.Unauthorized)
+
+  const note = await prisma.jobApplicationNote.create({
+    data: {
+      applicationId,
+      authorId: userId,
+      body,
+    },
+  })
+
+  return Result.ok(note)
+}
+
+export async function deleteApplicationNote(
+  noteId: string
+): Result.Async<Pick<JobApplicationNote, 'id'>, ActionError> {
+  const session = await Session.get<UserSession>(cookies())
+  if (!session.ok) return Result.error(ActionError.Unauthorized)
+
+  const note = await prisma.jobApplicationNote.findUnique({
+    where: { id: noteId },
+  })
+
+  if (!note) return Result.error(ActionError.NotFound)
+  if (note.authorId !== session.value.userId && session.value.role !== Role.Admin)
+    return Result.error(ActionError.Unauthorized)
+
+  await prisma.jobApplicationNote.delete({
+    where: { id: noteId },
+  })
+
+  return Result.ok({ id: note.id })
+}
+
+export async function updateApplicationStatus(
+  applicationId: string,
+  status: ApplicationStatus
+): Result.Async<JobApplication, ActionError> {
+  const session = await Session.get<UserSession>(cookies())
+  if (!session.ok) return Result.error(ActionError.Unauthorized)
+
+  const application = await prisma.jobApplication.findUnique({
+    where: { id: applicationId },
+  })
+
+  if (!application) return Result.error(ActionError.NotFound)
+  if (session.value.role === Role.Applicant) return Result.error(ActionError.Unauthorized)
+
+  if (status === ApplicationStatus.Submitted) {
+    return Result.error(ActionError.BadRequest)
+  }
+
+  const updatedApplication = await prisma.jobApplication.update({
+    where: { id: applicationId },
+    data: {
+      status,
+    },
+  })
+
+  return Result.ok(updatedApplication)
+}
+
+export async function sendRejectionEmail(applicationId: string): Result.Async<void, ActionError> {
+  const session = await Session.get<UserSession>(cookies())
+  if (!session.ok) return Result.error(ActionError.Unauthorized)
+
+  const application = await prisma.jobApplication.findUnique({
+    where: { id: applicationId },
+    include: applicationInclude,
+  })
+
+  if (!application) return Result.error(ActionError.NotFound)
+  if (session.value.role === Role.Applicant) return Result.error(ActionError.Unauthorized)
+
+  if (application.status !== ApplicationStatus.Rejected) {
+    return Result.error(ActionError.InvalidState)
+  }
+
+  await sendEmail(ApplicationRejected, {
+    subject: `About your ${application.listing.title} application at Lantern Hill`,
+    to: application.user.email,
+    props: { application },
+  })
+
+  return Result.ok()
+}

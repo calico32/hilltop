@@ -16,6 +16,9 @@ export type ActionError = Enum<typeof ActionError>
 export const ActionError = Enum({
   ServerError: 'ServerError',
   Unauthorized: 'Unauthorized',
+  NotFound: 'NotFound',
+  BadRequest: 'BadRequest',
+  InvalidState: 'InvalidState',
 })
 
 /**

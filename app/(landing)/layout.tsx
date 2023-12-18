@@ -1,4 +1,5 @@
 import AppBar from '@/_components/AppBar'
+import Footer from '@/_components/Footer'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -6,6 +7,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <AppBar landing />
       <div className="h-[72px]"></div>
       {children}
+      <Footer />
     </>
   )
 }
