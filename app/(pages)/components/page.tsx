@@ -38,6 +38,10 @@ function* combinations(variants: { [key: string]: any }[][]): Generator<{ [key: 
   }
 }
 
+export const metadata = {
+  robots: { index: false, follow: false },
+}
+
 export default function Page(): JSX.Element {
   const color = variant('color', ['primary', 'accent', 'danger', 'warning', 'neutral'])
   const style = variant([{}, { outlined: true }, { minimal: true }])

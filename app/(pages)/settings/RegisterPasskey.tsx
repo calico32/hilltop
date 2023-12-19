@@ -3,7 +3,7 @@
 import Button from '@/_components/Button'
 import { Dialog, Transition } from '@headlessui/react'
 import { Enum } from 'kiyoi'
-import { Plus } from 'lucide-react'
+import { KeyRound } from 'lucide-react'
 import React, { Fragment, useEffect, useState } from 'react'
 import RegisterPasskeyFailure from './RegisterPasskeyFailure'
 import RegisterPasskeyIntro from './RegisterPasskeyIntro'
@@ -63,13 +63,11 @@ export default function RegisterPasskeyButton(): JSX.Element {
   return (
     <>
       <Button
-        minimal
-        small
         onClick={() => setOpen(true)}
         color="primary"
         className="flex items-center gap-2 !px-4 !py-2"
       >
-        <Plus size={20} />
+        <KeyRound size={20} />
         Register
       </Button>
       <Transition show={open} as={Fragment}>

@@ -33,6 +33,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     headers: {
       'content-type': `image/${format}`,
       'content-disposition': `inline; filename="${item.name}"`,
+      'X-Robots-Tag': 'noindex',
     },
   })
 }

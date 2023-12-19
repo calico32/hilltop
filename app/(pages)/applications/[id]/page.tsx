@@ -3,6 +3,10 @@ import { Role } from '@prisma/client'
 import { notFound } from 'next/navigation'
 import ReviewApplicationPage from './ReviewApplicationPage'
 
+export const metadata = {
+  robots: { index: false, follow: false },
+}
+
 export default async function Page({ params }: { params: { id: string } }): Promise<JSX.Element> {
   if (!params.id) return notFound()
   const application = await server.getApplication(params.id)

@@ -5,11 +5,15 @@ import ApplicationCard from '@/_components/ApplicationCard'
 import Spinner from '@/_components/Spinner'
 import { useState } from 'react'
 
+// export const metadata = {
+//   robots: { index: false, follow: false },
+// }
+
 export default function Page(): JSX.Element {
   const [searchTerm, setSearchTerm] = useState('')
   const { data: applications, isLoading } = api.$use('searchApplications', searchTerm)
   const { data: currentUser, isLoading: userLoading } = api.$use('getUser')
-
+  //hi :)
   return (
     <>
       <h1 className="mb-4 text-3xl font-bold">Applications</h1>

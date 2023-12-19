@@ -19,27 +19,6 @@ interface AppBarMenuProps {
 export default function AppBarMenu({ landing }: AppBarMenuProps): JSX.Element {
   const { isLoading, data: user } = api.$use('getUser')
 
-  // const fn = getUser
-  // const fnName = 'getUser'
-  // const args: never[] = []
-
-  // const key = useMemo(() => swrKey(fnName, ...args), [fnName, args])
-  // const {
-  //   data: user,
-  //   error,
-  //   isLoading,
-  //   isValidating,
-  //   // mutate,
-  // } = useSWR(
-  //   key,
-  //   async (k) => {
-  //     const data = await fn(...args)
-  //     console.log('use', key, data)
-  //     return data
-  //   },
-  //   { revalidateOnMount: true }
-  // )
-
   const router = useRouter()
 
   return (
@@ -82,12 +61,13 @@ export default function AppBarMenu({ landing }: AppBarMenuProps): JSX.Element {
               <Menu.Items<'div'> className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y-2 divide-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="px-1 py-1 ">
                   <Menu.Item<typeof Fragment>>
-                    <button
+                    <Link
+                      href="/profile"
                       className={`ui-active:bg-navyblue-0 ui-active:text-white text-gray-900 group flex w-full items-center rounded-md px-2 py-2`}
                     >
                       <User2 className="w-5 h-5 mr-2" aria-hidden="true" />
                       Profile
-                    </button>
+                    </Link>
                   </Menu.Item>
                   <Menu.Item<typeof Fragment>>
                     <Link

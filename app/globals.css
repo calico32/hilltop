@@ -8,6 +8,12 @@
   grid-column-gap: 0.5rem;
 }
 
+.subwrapper {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column-gap: 0.5rem;
+}
+
 .wrapper > * {
   grid-column: 3;
 }

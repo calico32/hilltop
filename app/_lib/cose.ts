@@ -7,7 +7,6 @@ export abstract class COSEKey {
   kid?: Buffer
 
   protected constructor(public key: Buffer, public raw: { [key: number]: any }) {
-    console.log(this.raw)
     this.alg = this.raw[COSEKeys.alg]
     this.kty = this.raw[COSEKeys.kty]
     this.kid = this.raw[COSEKeys.kid]

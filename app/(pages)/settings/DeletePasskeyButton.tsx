@@ -2,7 +2,7 @@
 
 import api from '@/_api/client'
 import Button from '@/_components/Button'
-import { passkeyIcon } from '@/_util/passkey'
+import { PasskeyIcon } from '@/_components/PasskeyIcon'
 import { truncate } from '@/_util/string'
 import { Dialog, Transition } from '@headlessui/react'
 import { Passkey } from '@prisma/client'
@@ -24,7 +24,7 @@ export default function DeletePasskeyButton({ passkey }: DeletePasskeyButtonProp
         color="danger"
         minimal
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center !p-0 !h-[52px] !w-[52px]"
+        className="flex items-center justify-center !p-3 h-max"
       >
         <Trash2 size={24} />
       </Button>
@@ -67,7 +67,7 @@ export default function DeletePasskeyButton({ passkey }: DeletePasskeyButtonProp
                   <p>
                     Are you sure you want to delete
                     <span className="inline-block align-middle ml-1.5 mr-0.5">
-                      {passkeyIcon(passkey.transports, 20)}
+                      <PasskeyIcon transports={passkey.transports} size={20} />
                     </span>
                     <strong>{passkey.nickname ?? truncate(passkey.credentialId, 15)}</strong>? You
                     won't be able to use it to sign in anymore.

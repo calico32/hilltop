@@ -1,17 +1,22 @@
-import ListingCard from '@/_components/ListingCard'
-
-export default async function Page(): Promise<JSX.Element> {
-  const listings: any[] = []
-
+export default function Loading(): JSX.Element {
   return (
     <>
       <h1 className="mb-4 text-3xl font-bold">Explore Jobs</h1>
 
-      <ul>
-        {listings.map((listing) => (
-          <ListingCard key={listing.id} listing={listing} />
-        ))}
-      </ul>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="skeleton">
+          <div>Loading...</div>
+        </div>
+        <div className="skeleton">
+          <div>Loading...</div>
+        </div>
+        <div className="skeleton">
+          <div>Loading...</div>
+        </div>
+        <div className="skeleton">
+          <div>Loading...</div>
+        </div>
+      </div>
     </>
   )
 }

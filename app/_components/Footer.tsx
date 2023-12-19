@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export default function Footer(): JSX.Element {
   return (
-    <footer className="mt-32 py-8 bg-navyblue-0 text-white wrapper !bleed-full">
+    <footer className="mt-32 self-end py-8 bg-navyblue-0 text-white wrapper !bleed-full">
       <div className="md:!bleed-half flex gap-8 sm:flex-row flex-col">
         <div className="flex flex-col md:w-max gap-4 sm:flex-1 md:flex-auto">
           <div className="flex gap-4 items-center">
@@ -13,6 +13,7 @@ export default function Footer(): JSX.Element {
           <div className="font-serif">
             The hilltop is where the best views are. We're here to help you find yours.
           </div>
+          <div className="flex-1" />
           <div className="md:w-max text-sm text-gray-400">
             © 2023-24 by the Hilltop team. All rights reserved.
           </div>

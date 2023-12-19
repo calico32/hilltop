@@ -58,6 +58,7 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
       <button
         className="flex items-baseline justify-center rounded-md p-1.5 self-center"
         onClick={() => setOpen(true)}
+        aria-label="Open menu"
       >
         <MenuIcon size={24} strokeWidth={1.5} />
       </button>

@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { Figtree, Lora } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
 
+import Footer from '@/_components/Footer'
 import './globals.css'
 
 const serif = Lora({ subsets: ['latin'], variable: '--serif' })
@@ -21,9 +22,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={clsx(serif.variable, sans.variable, 'font-sans min-h-screen')}>
+      <body className={clsx(serif.variable, sans.variable, 'font-sans wrapper')}>
         <Toaster position="top-center" />
-        <div className="wrapper">{children}</div>
+        {children}
+        <Footer />
         <Analytics />
       </body>
     </html>

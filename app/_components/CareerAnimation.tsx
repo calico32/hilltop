@@ -1,39 +1,5 @@
 'use client'
 
-const careers = [
-  'accounting',
-  'architecture',
-  'construction',
-  'customer service',
-  'data analysis',
-  'data science',
-  'design',
-  'finance',
-  'food preparation',
-  'foodservice',
-  'healthcare',
-  'hospitality',
-  'human resources',
-  'legal',
-  'logistics',
-  'maintenance',
-  'management',
-  'marketing',
-  'nursing',
-  'operations',
-  'personal care',
-  'project management',
-  'property management',
-  'public relations',
-  'real estate',
-  'sales',
-  'security',
-  'social services',
-  'software engineering',
-  'technology',
-  'transportation',
-]
-
 import clsx from 'clsx'
 import { motion } from 'framer-motion'
 import { useEffect, useMemo, useState } from 'react'
@@ -56,7 +22,6 @@ export default function CareerAnimation(): JSX.Element {
   const [previous, setPrevious] = useState(current)
 
   useEffect(() => {
-    console.log('useEffect')
     setClassName(!element ? '' : 'p-2')
     setFontSize(determineFontSize(window.innerWidth))
     if (!element) {
@@ -202,3 +167,37 @@ function determineFontSize(windowWidth: number) {
     return 32
   }
 }
+
+const careers = [
+  'accounting',
+  'architecture',
+  'construction',
+  'customer service',
+  'data analysis',
+  'data science',
+  'design',
+  'finance',
+  'food preparation',
+  'foodservice',
+  'healthcare',
+  'hospitality',
+  'human resources',
+  'legal',
+  'logistics',
+  'maintenance',
+  'management',
+  'marketing',
+  'nursing',
+  'operations',
+  'personal care',
+  'project management',
+  'property management',
+  'public relations',
+  'real estate',
+  'sales',
+  'security',
+  'social services',
+  'software engineering',
+  'technology',
+  'transportation',
+]

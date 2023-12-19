@@ -23,7 +23,7 @@ export default async function AppBar({ landing }: AppBarProps) {
     >
       <ScrollHandler />
       <div className="flex items-baseline bleed-none min-[900px]:bleed-half h-[40px]">
-        <Link href="/" className="self-center mr-4 mb-2">
+        <Link href="/" className="self-center mr-4 mb-2" aria-label="Home">
           <Logo dark={landing} size={36} />
         </Link>
 

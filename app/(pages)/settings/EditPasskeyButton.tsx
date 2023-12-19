@@ -3,7 +3,7 @@
 import api from '@/_api/client'
 import Button from '@/_components/Button'
 import styles from '@/_components/Input.module.css'
-import { passkeyIcon } from '@/_util/passkey'
+import { PasskeyIcon } from '@/_components/PasskeyIcon'
 import { truncate } from '@/_util/string'
 import { Dialog, Transition } from '@headlessui/react'
 import { Passkey } from '@prisma/client'
@@ -27,7 +27,7 @@ export default function EditPasskeyButton({ passkey }: EditPasskeyButtonProps): 
         color="neutral"
         minimal
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center !p-0 !h-[52px] !w-[52px]"
+        className="flex items-center justify-center !p-3 h-max"
       >
         <Pencil size={24} />
       </Button>
@@ -65,7 +65,9 @@ export default function EditPasskeyButton({ passkey }: EditPasskeyButtonProps): 
                     </button>
                   </div>
 
-                  <div className="mx-auto my-4">{passkeyIcon(passkey.transports, 48)}</div>
+                  <div className="mx-auto my-4">
+                    <PasskeyIcon transports={passkey.transports} size={48} />
+                  </div>
 
                   <p>
                     You can set a nickname for this passkey to help you identify it. This is only

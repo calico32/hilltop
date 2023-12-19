@@ -19,8 +19,6 @@ export const getListings = cache(async () => {
       })
     : null
 
-  console.log('user', user)
-
   const listings = await prisma.jobListing.findMany({
     where: {
       status: !user || user.role === Role.Applicant ? ListingStatus.Active : undefined,

@@ -139,7 +139,6 @@ async function passkeyLogin({
     // 2. Call navigator.credentials.get() and pass options as the publicKey
     //    option. Let credential be the result of the successfully resolved
     //    promise.
-    console.log(options)
     const credential = await navigator.credentials.get({ publicKey: options })
     if (!credential || !(credential instanceof PublicKeyCredential)) {
       setPasskeyError(

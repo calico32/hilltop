@@ -1,6 +1,11 @@
 import { KeyRound, MonitorSmartphone } from 'lucide-react'
 
-export function passkeyIcon(transports: string[], size = 30): JSX.Element {
+interface PasskeyIconProps {
+  transports: string[]
+  size?: number
+}
+
+export function PasskeyIcon({ transports, size = 36 }: PasskeyIconProps): JSX.Element {
   if (transports.includes('hybrid')) {
     return <MonitorSmartphone size={size} />
   }

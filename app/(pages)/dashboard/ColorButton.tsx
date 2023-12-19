@@ -22,8 +22,6 @@ function randomColor() {
 export default function ColorButton({ children }: ColorButtonProps): JSX.Element {
   const [color, setColor] = useState(randomColor())
 
-  console.log('render', color)
-
   return (
     <Button
       style={{

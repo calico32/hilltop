@@ -48,7 +48,6 @@ export async function verifySignature({
   signature,
 }: VerifyData): Promise<boolean> {
   const coseKey = COSEKey.from(publicKey)
-  console.log(coseKey)
   const cryptoKey = await parseCryptoKey(algoParams[algorithm], coseKey.toJWK())
 
   // 22. Let hash be the result of computing a hash over the cData using

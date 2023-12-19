@@ -2,16 +2,19 @@ import CareerAnimation from '@/_components/CareerAnimation'
 import Image from 'next/image'
 import Link from 'next/link'
 
+const imageWidth = 1200
+const imageHeight = Math.round(imageWidth * (21 / 32))
+
 export default async function Home() {
   return (
     <>
       <Image
         src={(await import('@/_assets/senior2.png')).default}
-        width={3200}
-        height={2100}
+        width={imageWidth}
+        height={imageHeight}
         priority
         alt=""
-        className="absolute -z-10 w-full brightness-75 object-cover object-center bleed-full h-[400px] pointer-events-none"
+        className="absolute -z-10 w-full brightness-75 blur-sm object-cover object-center bleed-full h-[400px] pointer-events-none"
       />
 
       <div className="absolute -z-10 w-full brightness-75 object-cover object-center bleed-full h-[400px] pointer-events-none bg-black/50"></div>

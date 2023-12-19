@@ -6,7 +6,16 @@ import ModalTitleBar from '@/_components/ModalTitleBar'
 import { avatar, displayName, formatPay, fullName, phoneNumber } from '@/_lib/format'
 import { User } from '@prisma/client'
 import { stripIndent } from 'common-tags'
-import { ArrowLeft, ArrowUpRightSquare, Cake, Mail, MapPin, Phone, UserSquare2 } from 'lucide-react'
+import {
+  ArrowLeft,
+  ArrowUpRightSquare,
+  Cake,
+  Mail,
+  MapPin,
+  Percent,
+  Phone,
+  UserSquare2,
+} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import ApplicationNotes from './ApplicationNotes'
@@ -139,7 +148,10 @@ export default function ReviewApplicationPage({
               <Cake size={20} strokeWidth={1.5} />
               {new Date(applicantInfo.dob + 'Z').toUTCString().slice(5, 16)}
             </span>
-            <HiddenTaxId taxId={applicantInfo.taxId} />
+            <span className="flex items-center gap-2">
+              <Percent size={20} strokeWidth={1.5} />
+              <HiddenTaxId taxId={applicantInfo.taxId} />
+            </span>
           </div>
 
           <h2 className="mt-4 mb-1 font-semibold md:mb-2 md:mt-0">Contact Info</h2>

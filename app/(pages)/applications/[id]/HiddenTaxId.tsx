@@ -1,7 +1,7 @@
 'use client'
 
 import { taxId } from '@/_lib/format'
-import { Eye, EyeOff, Percent } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 
 interface HiddenTaxIdProps {
@@ -12,7 +12,6 @@ export default function HiddenTaxId(props: HiddenTaxIdProps): JSX.Element {
   const [visible, setVisible] = useState(false)
   return (
     <span className="flex items-center gap-2">
-      <Percent size={20} strokeWidth={1.5} />
       {taxId(visible ? props.taxId : props.taxId?.replaceAll(/\d/g, '*') ?? null)}
       {visible ? (
         <Eye

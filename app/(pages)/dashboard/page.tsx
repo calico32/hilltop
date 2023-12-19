@@ -11,6 +11,10 @@ function accepted(a: { status: ApplicationStatus }) {
   return a.status === ApplicationStatus.Offered || a.status === ApplicationStatus.Hired
 }
 
+export const metadata = {
+  robots: { index: false, follow: false },
+}
+
 export default async function Page(): Promise<JSX.Element> {
   const user = await server.getUser()
 

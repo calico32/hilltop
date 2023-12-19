@@ -14,6 +14,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     headers: {
       'content-type': item.type,
       'content-disposition': `inline; filename="${item.name}"`,
+      'X-Robots-Tag': 'noindex',
     },
   })
 }
