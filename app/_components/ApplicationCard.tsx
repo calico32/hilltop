@@ -3,10 +3,21 @@ import { LinkButton } from '@/_components/Button'
 import { applicationStatusColors, applicationStatuses } from '@/_lib/data'
 import { avatar, fullName } from '@/_lib/format'
 import { truncate } from '@/_util/string'
+import {
+  FloatingArrow,
+  arrow,
+  autoUpdate,
+  offset,
+  useFloating,
+  useHover,
+  useInteractions,
+  useTransitionStyles,
+} from '@floating-ui/react'
 import { Role, User } from '@prisma/client'
 import clsx from 'clsx'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRef, useState } from 'react'
 
 interface ApplicationCardProps {
   application: FullApplication
@@ -18,8 +29,70 @@ export default function ApplicationCard({
   currentUser,
 }: ApplicationCardProps): JSX.Element {
   if (currentUser?.role === Role.Recruiter || currentUser?.role === Role.Admin) {
+    const submitted = new Date(application.created)
+    const diff = Date.now() - submitted.getTime()
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+    const showWarning = days > 7
+    const arrowRef = useRef(null)
+    const ARROW_HEIGHT = 7
+    const GAP = 2
+    const [open, setOpen] = useState(false)
+    const { refs, context, floatingStyles } = useFloating({
+      open: open,
+      onOpenChange: setOpen,
+      placement: 'top-end',
+      whileElementsMounted: autoUpdate,
+      middleware: [
+        offset(ARROW_HEIGHT + GAP),
+        arrow({
+          element: arrowRef,
+        }),
+      ],
+    })
+
+    const { getFloatingProps, getReferenceProps } = useInteractions([useHover(context)])
+    const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
+      duration: 200,
+
+      initial: {
+        opacity: 0,
+        transform: 'translateY(10px) scale(0.95)',
+      },
+      open: {
+        opacity: 1,
+        transform: 'translateY(0) scale(1)',
+      },
+    })
+
     return (
-      <div className="flex p-3 gap-4 rounded-md shadow-md border border-gray-300">
+      <div className="relative flex gap-4 p-3 border border-gray-300 rounded-md shadow-md">
+        {showWarning && (
+          <>
+            {isMounted && (
+              <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+                <div
+                  style={transitionStyles}
+                  className="p-3 bg-red-100 rounded-md shadow-md shadow-red-900/10 text-red-950 ounded-br-none w-max"
+                >
+                  <FloatingArrow
+                    height={ARROW_HEIGHT}
+                    fill="rgb(254, 226, 226)"
+                    className="drop-shadow-md"
+                    ref={arrowRef}
+                    context={context}
+                  />
+                  Application submitted {days} days ago. Consider following up.
+                </div>
+              </div>
+            )}
+            <div className="absolute w-4 h-4 bg-red-600 rounded-full -top-1 -right-1 animate-ping" />
+            <div
+              className="absolute w-4 h-4 bg-red-600 rounded-full -top-1 -right-1"
+              ref={refs.setReference}
+              {...getReferenceProps()}
+            />
+          </>
+        )}
         <div className="flex flex-col gap-1 w-60">
           <div className="flex items-center gap-3 mb-2">
             <Image
@@ -31,22 +104,20 @@ export default function ApplicationCard({
             />
             <div className="leading-tight">
               <Link href={`/profile/${application.userId}`} className="hover:underline">
-                <h1 className="text-xl font-semibold inline">{fullName(application.user)}</h1>
+                <h1 className="inline text-xl font-semibold">{fullName(application.user)}</h1>
                 <span className="text-gray-600">&nbsp;&nbsp;{application.user.age}</span>
               </Link>
               <div className="text-gray-600">{application.user.email}</div>
             </div>
           </div>
-
           {/* <div className="text-gray-600">
             {application.user.city}, {application.user.state}
           </div> */}
-
-          <div className="text-gray-600 text-sm italic">{truncate(application.user.bio, 100)}</div>
+          <div className="text-sm italic text-gray-600">{truncate(application.user.bio, 100)}</div>
         </div>
         <div className="border-r border-gray-400" />
-        <div className="flex flex-col gap-4 flex-grow">
-          <div className="flex gap-4 items-center">
+        <div className="flex flex-col flex-grow gap-4">
+          <div className="flex items-center gap-4">
             <h1 className="text-2xl font-semibold">{application.listing.title}</h1>
             <span
               className={clsx(
@@ -57,10 +128,12 @@ export default function ApplicationCard({
               {applicationStatuses[application.status]}
             </span>
           </div>
-          <div className="flex gap-8 items-center">
+          <div className="flex items-center gap-8">
             <div className="flex flex-col">
               <span className="text-sm text-gray-600">Submitted</span>
-              <span className="text-sm">{application.created.toLocaleDateString()}</span>
+              <span className={clsx('text-sm', showWarning && 'text-red-600')}>
+                {application.created.toLocaleDateString()}
+              </span>
             </div>
             <div className="flex flex-col">
               <span className="text-sm text-gray-600">Last Updated</span>
@@ -70,7 +143,7 @@ export default function ApplicationCard({
           {application.reviewer && (
             <div className="flex flex-col">
               <span className="text-sm text-gray-600">Reviewer</span>
-              <span className="text-sm flex items-center gap-2">
+              <span className="flex items-center gap-2 text-sm">
                 <Image
                   src={avatar(application.reviewer)}
                   alt=""
@@ -104,10 +177,10 @@ export default function ApplicationCard({
   }
 
   return (
-    <div className="flex flex-col p-3 gap-2 rounded-md shadow-md border border-gray-300">
+    <div className="flex flex-col gap-2 p-3 border border-gray-300 rounded-md shadow-md">
       {currentUser && currentUser.id !== application.userId && (
         <Link
-          className="flex items-center gap-1 hover:underline cursor-pointer"
+          className="flex items-center gap-1 cursor-pointer hover:underline"
           href={`/profile/${application.userId}`}
         >
           <Image
@@ -120,7 +193,7 @@ export default function ApplicationCard({
           <h1 className="text-xl font-medium">{fullName(application.user)}</h1>
         </Link>
       )}
-      <div className="font-semibold my-auto">
+      <div className="my-auto font-semibold">
         <h1 className="text-2xl">{application.listing.title}</h1>
         <h1>Submitted: {application.created.toDateString()}</h1>
         <h1>Status: {application.status.toString()}</h1>

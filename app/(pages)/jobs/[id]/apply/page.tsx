@@ -1,3 +1,4 @@
+import ApplyForm from '@/(pages)/jobs/[id]/apply/ApplyForm'
 import server from '@/_api/server'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -21,6 +22,7 @@ export default async function Page({ params }: { params: { id: string } }): Prom
           <h1 className="text-3xl">
             Apply for <strong>{listing.title}</strong>
           </h1>
+          <ApplyForm />
         </div>
       </div>
     </>

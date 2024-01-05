@@ -116,7 +116,7 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
                   </div>
                   {!user && (
                     <div className="flex items-baseline justify-end">
-                      <Link href="/login" className="">
+                      <Link href="/login" onClick={() => setOpen(false)} className="">
                         Sign in
                       </Link>
 

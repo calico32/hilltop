@@ -23,6 +23,7 @@
     "@react-email/render": "0.0.9"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.26.4",
     "@headlessui/react": "^1.7.17",
     "@headlessui/tailwindcss": "^0.2.0",
     "@prisma/client": "^5.5.2",
@@ -75,6 +76,7 @@
     "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.2",
     "postcss": "^8.4.31",
+    "prettier-plugin-tailwindcss": "^0.5.9",
     "tailwindcss": "^3.3.5"
   }
 }

@@ -5,7 +5,9 @@ import ModalAwareLink from '@/_components/ModalAwareLink'
 import ModalTitleBar from '@/_components/ModalTitleBar'
 import { avatar, displayName, formatPay, fullName, phoneNumber } from '@/_lib/format'
 import { User } from '@prisma/client'
+import clsx from 'clsx'
 import { stripIndent } from 'common-tags'
+import { formatDistanceToNow } from 'date-fns'
 import {
   ArrowLeft,
   ArrowUpRightSquare,
@@ -21,7 +23,6 @@ import Link from 'next/link'
 import ApplicationNotes from './ApplicationNotes'
 import ApplicationStatusSelect from './ApplicationStatusSelect'
 import HiddenTaxId from './HiddenTaxId'
-import RejectApplicationButton from './RejectApplicationButton'
 
 interface ReviewApplicationPageProps {
   modal?: boolean
@@ -76,10 +77,15 @@ export default function ReviewApplicationPage({
     phone: phoneNumber(currentUser.phone),
   }
 
+  const submitted = new Date(application.created)
+  const diff = Date.now() - submitted.getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const showWarning = days > 7
+
   return (
     <>
       {modal ? (
-        <ModalTitleBar className="mb-6">
+        <ModalTitleBar>
           <h1 className="text-3xl">
             Review:{' '}
             <ModalAwareLink href={`/profile/${applicant.id}`} className="font-bold hover:underline">
@@ -93,7 +99,7 @@ export default function ReviewApplicationPage({
         </ModalTitleBar>
       ) : (
         <>
-          <Link href="/applications" className="flex items-center gap-1 mb-4 hover:underline w-max">
+          <Link href="/applications" className="flex w-max items-center gap-1 hover:underline">
             <ArrowLeft size={20} strokeWidth={1.5} />
             Back to Applications
           </Link>
@@ -110,6 +116,22 @@ export default function ReviewApplicationPage({
         </>
       )}
 
+      <div className="mb-6 flex flex-col gap-2 text-sm text-gray-500 md:flex-row">
+        <span>
+          Submitted{' '}
+          <span className={clsx(showWarning && 'text-red-500')}>
+            {formatDistanceToNow(new Date(application.created), { addSuffix: true })}
+          </span>
+        </span>
+        <span className="hidden md:block">·</span>
+        <span>
+          Last updated{' '}
+          {formatDistanceToNow(new Date(application.updated), {
+            addSuffix: true,
+          })}
+        </span>
+      </div>
+
       <div>
         <Image
           src={avatar(applicant, { size: 300 })}
@@ -119,9 +141,9 @@ export default function ReviewApplicationPage({
           className="float-right mb-2 ml-2 rounded-full"
         />
 
-        <div className="grid md:grid-cols-none md:grid-flow-col mb-4 md:grid-rows-[auto_auto] grid-rows-[repeat(auto,6)]">
+        <div className="mb-4 grid grid-rows-[repeat(auto,6)] md:grid-flow-col md:grid-cols-none md:grid-rows-[auto_auto]">
           <h2 className="mb-1 font-semibold md:mb-2">Applicant</h2>
-          <div className="flex flex-col items-baseline gap-1 sm:flex-row md:flex-col md:items-start sm:gap-8 md:gap-1">
+          <div className="flex flex-col items-baseline gap-1 sm:flex-row sm:gap-8 md:flex-col md:items-start md:gap-1">
             <div className="flex items-baseline">
               <ModalAwareLink
                 className="text-2xl font-bold hover:underline"
@@ -142,8 +164,8 @@ export default function ReviewApplicationPage({
             </span>
           </div>
 
-          <h2 className="mt-4 mb-1 font-semibold md:mb-2 md:mt-0">Personal Info</h2>
-          <div className="flex flex-col items-baseline gap-1 sm:flex-row md:flex-col md:items-start sm:gap-8 md:gap-1">
+          <h2 className="mb-1 mt-4 font-semibold md:mb-2 md:mt-0">Personal Info</h2>
+          <div className="flex flex-col items-baseline gap-1 sm:flex-row sm:gap-8 md:flex-col md:items-start md:gap-1">
             <span className="flex items-center gap-2">
               <Cake size={20} strokeWidth={1.5} />
               {new Date(applicantInfo.dob + 'Z').toUTCString().slice(5, 16)}
@@ -154,8 +176,8 @@ export default function ReviewApplicationPage({
             </span>
           </div>
 
-          <h2 className="mt-4 mb-1 font-semibold md:mb-2 md:mt-0">Contact Info</h2>
-          <div className="flex flex-col items-baseline gap-1 sm:flex-row md:flex-col md:items-start sm:gap-8 md:gap-1">
+          <h2 className="mb-1 mt-4 font-semibold md:mb-2 md:mt-0">Contact Info</h2>
+          <div className="flex flex-col items-baseline gap-1 sm:flex-row sm:gap-8 md:flex-col md:items-start md:gap-1">
             <a
               className="flex items-center gap-2 hover:underline"
               href={`mailto:${applicant.email}`}
@@ -177,18 +199,18 @@ export default function ReviewApplicationPage({
         <div className="italic text-gray-600">{applicant.bio}</div>
 
         {application.resume && (
-          <div className="flex flex-col items-start mt-4 gap-2">
+          <div className="mt-4 flex flex-col items-start gap-2">
             <div className="">{displayName(applicant)} attached a resume to this application.</div>
             <FileCard file={application.resume} />
           </div>
         )}
 
         <div
-          className="mt-8 grid md:grid-cols-none md:grid-flow-col mb-4 md:grid-rows-[auto_auto] grid-rows-[repeat(auto,6)]"
+          className="mb-4 mt-8 grid grid-rows-[repeat(auto,6)] md:grid-flow-col md:grid-cols-none md:grid-rows-[auto_auto]"
           style={{ gridTemplateRows: 'auto auto' }}
         >
           <h2 className="mb-1 font-semibold md:mb-2">Listing</h2>
-          <div className="flex flex-col items-baseline gap-1 sm:flex-row md:flex-col md:items-start sm:gap-8 md:gap-1">
+          <div className="flex flex-col items-baseline gap-1 sm:flex-row sm:gap-8 md:flex-col md:items-start md:gap-1">
             <div className="flex items-baseline">
               <ModalAwareLink
                 className="text-2xl font-bold hover:underline"
@@ -216,21 +238,21 @@ export default function ReviewApplicationPage({
             </ModalAwareLink>
           </div>
 
-          <h2 className="mt-4 mb-1 font-semibold md:mb-2 md:mt-0">Job Requirements</h2>
-          <ul className="flex flex-col flex-wrap items-baseline gap-1 ml-4 list-disc sm:flex-row md:flex-col md:items-start sm:gap-10 md:gap-1">
+          <h2 className="mb-1 mt-4 font-semibold md:mb-2 md:mt-0">Job Requirements</h2>
+          <ul className="ml-4 flex list-disc flex-col flex-wrap items-baseline gap-1 sm:flex-row sm:gap-10 md:flex-col md:items-start md:gap-1">
             {listing.requirements.map((req) => (
               <li key={req}>{req}</li>
             ))}
           </ul>
 
-          <h2 className="mt-4 mb-1 font-semibold md:mb-2 md:mt-0">Listed Pay & Benefits</h2>
-          <div className="flex flex-col items-baseline gap-1 sm:flex-row md:flex-col md:items-start sm:gap-8 md:gap-1">
+          <h2 className="mb-1 mt-4 font-semibold md:mb-2 md:mt-0">Listed Pay & Benefits</h2>
+          <div className="flex flex-col items-baseline gap-1 sm:flex-row sm:gap-8 md:flex-col md:items-start md:gap-1">
             <div>
               {formatPay(
                 listing.payType,
                 listing.payMin.toLocaleString(),
                 listing.payMax?.toLocaleString(),
-                true
+                true,
               )}
             </div>
             {listing.benefits.map((b) => b.replaceAll(' insurance', '')).join(', ')}
@@ -239,13 +261,13 @@ export default function ReviewApplicationPage({
 
         <div className="mb-8 italic text-gray-600">{listing.description}</div>
 
-        <h2 className="mt-4 mb-2 font-bold text-2xl">Application Questions</h2>
+        <h2 className="mb-2 mt-4 text-2xl font-bold">Application Questions</h2>
         <ol className="ml-4 list-decimal">
           {listing.questions.map((q) => {
             const a = application.questions.find((a) => a.sequence === q.sequence)
             return (
               <div key={q.sequence} className="mb-6">
-                <li className="mb-2 font-bold prose">
+                <li className="prose mb-2 font-bold">
                   <p>{q.question}</p>
                 </li>
                 <div className="flex gap-3">
@@ -254,7 +276,7 @@ export default function ReviewApplicationPage({
                     alt=""
                     width={24}
                     height={24}
-                    className="float-left w-6 h-6 mt-px rounded-full"
+                    className="float-left mt-px h-6 w-6 rounded-full"
                   />
 
                   {a ? (
@@ -281,15 +303,9 @@ export default function ReviewApplicationPage({
         <div className="mt-8">
           <h1 className="mb-4 text-2xl font-bold">Actions</h1>
 
-          <h2 className="mt-4 mb-2 text-xl font-semibold">Update Status</h2>
+          <ApplicationStatusSelect initialApplication={application} />
 
-          <div className="flex flex-wrap gap-4">
-            <RejectApplicationButton application={application} />
-
-            <ApplicationStatusSelect initialStatus={application.status} />
-          </div>
-
-          <h2 className="mt-4 mb-2 text-xl font-semibold">Contact Applicant</h2>
+          <h2 className="mb-2 mt-4 text-xl font-semibold">Contact Applicant</h2>
 
           <div className="flex flex-wrap gap-4">
             <LinkButton

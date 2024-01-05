@@ -1,13 +1,12 @@
-'use client'
-
 import { Dialog, Transition } from '@headlessui/react'
+import 'client-only'
 import clsx from 'clsx'
 import { Fragment, ReactNode, createContext } from 'react'
 
 interface ModalProps {
   children: ReactNode
   open: boolean
-  onClose?: () => void
+  onClose: () => void
   className?: string
 }
 

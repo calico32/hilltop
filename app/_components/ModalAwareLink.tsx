@@ -1,5 +1,6 @@
 'use client'
 
+import { ModalContext } from '@/_components/Modal'
 import { PageModalContext } from '@/_components/PageModal'
 import Link, { LinkProps } from 'next/link'
 import React, { AnchorHTMLAttributes, useContext } from 'react'
@@ -16,13 +17,18 @@ export default function ModalAwareLink({
   ...props
 }: ModalAwareLinkProps): JSX.Element {
   const pageModal = useContext(PageModalContext)
+  const modal = useContext(ModalContext)
 
   return (
     <Link
       href={href}
-      replace
+      replace={!!pageModal}
       onClick={() => {
-        pageModal?.close()
+        if (pageModal) {
+          pageModal.close()
+        } else {
+          modal?.onClose()
+        }
       }}
       {...props}
     >

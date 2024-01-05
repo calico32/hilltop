@@ -3,8 +3,10 @@ import {
   deleteApplicationNote,
   getApplication,
   getApplicationNotes,
+  getApplicationStatus,
   getApplications,
   searchApplications,
+  setApplicationStatus,
 } from '@/_api/applications'
 import {
   forgotPassword,
@@ -75,9 +77,26 @@ const server = {
    * - If the user is an applicant, only their applications are returned.
    * - If the user is not an applicant, all applications are returned.
    * @param id - The ID of the job application to retrieve.
-   * @returns A promise that resolves to the retrieved job application, or null if the application is not found or the user is not authorized to view it.
+   * @returns A promise that resolves to the retrieved job application, or null
+   * if the application is not found or the user is not authorized to view it.
    */
   getApplication,
+  /**
+   * Retrieve the status of a job application.
+   * @param id - The ID of the job application to retrieve.
+   * @returns A promise that resolves to the status of the job application, or
+   * null if the application is not found or the user is not authorized to view
+   * it.
+   */
+  getApplicationStatus,
+  /**
+   * Set the status of a job application.
+   * @param id - The ID of the job application to update.
+   * @param status - The new status of the job application.
+   * @returns A promise that resolves to the updated job application, or null
+   * if the application is not found or the user is not authorized to view it.
+   */
+  setApplicationStatus,
   /**
    * Search for job applications by their title or description. If the user is
    * an applicant, only their applications are returned. If the user is not an

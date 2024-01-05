@@ -1,6 +1,9 @@
 'use client'
 
+import LoginForm from '@/(pages)/login/LoginForm'
 import api from '@/_api/client'
+import Modal from '@/_components/Modal'
+import ModalTitleBar from '@/_components/ModalTitleBar'
 import NavLink from '@/_components/NavLink'
 import Spinner from '@/_components/Spinner'
 import { avatar, displayName } from '@/_lib/format'
@@ -9,7 +12,7 @@ import { ChevronDownIcon, LifeBuoy, LogOut, Settings, User2 } from 'lucide-react
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import toast from 'react-hot-toast'
 
 interface AppBarMenuProps {
@@ -117,14 +120,34 @@ export default function AppBarMenu({ landing }: AppBarMenuProps): JSX.Element {
 
 function LoginMenu() {
   const pathname = usePathname()
+  const [loginOpen, setLoginOpen] = useState(false)
 
   return (
     <>
-      {pathname !== '/login' && (
-        <Link href="/login" className="">
-          Sign in
-        </Link>
-      )}
+      {pathname !== '/login' && <button onClick={() => setLoginOpen(true)}>Sign in</button>}
+
+      <Modal open={loginOpen} onClose={() => setLoginOpen(false)}>
+        <ModalTitleBar className="absolute right-8 top-8">
+          <></>
+        </ModalTitleBar>
+        <div className="p-2 rounded-lg flex items-center flex-col gap-4 w-[30ch] xs:w-[35ch] sm:w-[45ch]">
+          <h1 className="text-2xl xs:text-3xl font-semibold">Welcome back!</h1>
+
+          <div className="text-gray-500 text-sm">
+            Don't have an account?{' '}
+            <Link
+              href="/register"
+              onClick={() => setLoginOpen(false)}
+              className="underline text-blue-600"
+            >
+              Register
+            </Link>{' '}
+            today!
+          </div>
+
+          <LoginForm />
+        </div>
+      </Modal>
 
       {pathname !== '/register' && (
         <Link

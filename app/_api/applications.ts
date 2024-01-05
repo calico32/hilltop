@@ -89,7 +89,7 @@ export const getApplications = cache(async (): Promise<FullApplication[]> => {
         ;(a.user as FullApplication['user']).age = age(await decrypt<string>(a.user.dob))
         prisma.redact(a.user, ['taxId', 'password', 'dob'])
         return a.user as User & { age: number }
-      })
+      }),
     )
 
     return applications.map((a, i) => ({ ...a, user: users[i] }))
@@ -106,11 +106,52 @@ export const getApplications = cache(async (): Promise<FullApplication[]> => {
       ;(a.user as FullApplication['user']).age = age(await decrypt<string>(a.user.dob))
       prisma.redact(a.user, ['taxId', 'password', 'dob'])
       return a.user as User & { age: number }
-    })
+    }),
   )
 
   return applications.map((a, i) => ({ ...a, user: users[i] }))
 })
+
+export async function getApplicationStatus(
+  applicationId: string,
+): Promise<ApplicationStatus | null> {
+  const session = await Session.get<UserSession>(cookies())
+  if (!session.ok) return null
+
+  const application = await prisma.jobApplication.findUnique({
+    where: { id: applicationId },
+  })
+
+  if (!application) return null
+  if (session.value.role === Role.Applicant && application.userId !== session.value.userId)
+    return null
+
+  return application.status
+}
+
+export async function setApplicationStatus(
+  applicationId: string,
+  status: ApplicationStatus,
+): Result.Async<JobApplication, ActionError> {
+  const session = await Session.get<UserSession>(cookies())
+  if (!session.ok) return Result.error(ActionError.Unauthorized)
+
+  const application = await prisma.jobApplication.findUnique({
+    where: { id: applicationId },
+  })
+
+  if (!application) return Result.error(ActionError.NotFound)
+  if (session.value.role === Role.Applicant) return Result.error(ActionError.Unauthorized)
+
+  const updatedApplication = await prisma.jobApplication.update({
+    where: { id: applicationId },
+    data: {
+      status,
+    },
+  })
+
+  return Result.ok(updatedApplication)
+}
 
 type ApplicationQuery = string | { listingId: string; userId: string }
 
@@ -146,11 +187,21 @@ export const getApplication = cache(
         age: age(dob!),
       },
     }
-  }
+  },
 )
 
-export const searchApplications = cache(async (searchTerm: string): Promise<FullApplication[]> => {
-  if (!searchTerm) return await getApplications()
+export interface SearchApplicationQuery {
+  search?: string
+  jobId?: string
+  applicantId?: string
+  status?: ApplicationStatus[]
+}
+
+export async function searchApplications(
+  query: SearchApplicationQuery,
+): Promise<FullApplication[]> {
+  if (Object.keys(query).length === 0 || Object.values(query).every((v) => !v))
+    return await getApplications()
 
   const session = await Session.get<UserSession>(cookies())
   if (!session.ok) return []
@@ -168,9 +219,7 @@ export const searchApplications = cache(async (searchTerm: string): Promise<Full
   const applications = await prisma.jobApplication.findMany({
     where: {
       ...where,
-      listing: {
-        title: { search: `${searchTerm.replaceAll(' ', '+')}` },
-      },
+      listing: {},
     },
     include: applicationInclude,
   })
@@ -180,14 +229,14 @@ export const searchApplications = cache(async (searchTerm: string): Promise<Full
       ;(a.user as FullApplication['user']).age = age(await decrypt<string>(a.user.dob))
       prisma.redact(a.user, ['taxId', 'password', 'dob'])
       return a.user as User & { age: number }
-    })
+    }),
   )
 
   return applications.map((a, i) => ({ ...a, user: users[i] }))
-})
+}
 
 export async function getApplicationNotes(
-  applicationId: string
+  applicationId: string,
 ): Promise<FullApplication['notes']> {
   const session = await Session.get<UserSession>(cookies())
   if (!session.ok) return []
@@ -208,7 +257,7 @@ export async function getApplicationNotes(
 
 export async function addApplicationNote(
   applicationId: string,
-  body: string
+  body: string,
 ): Result.Async<JobApplicationNote, ActionError> {
   const session = await Session.get<UserSession>(cookies())
   if (!session.ok) return Result.error(ActionError.Unauthorized)
@@ -235,7 +284,7 @@ export async function addApplicationNote(
 }
 
 export async function deleteApplicationNote(
-  noteId: string
+  noteId: string,
 ): Result.Async<Pick<JobApplicationNote, 'id'>, ActionError> {
   const session = await Session.get<UserSession>(cookies())
   if (!session.ok) return Result.error(ActionError.Unauthorized)
@@ -257,7 +306,7 @@ export async function deleteApplicationNote(
 
 export async function updateApplicationStatus(
   applicationId: string,
-  status: ApplicationStatus
+  status: ApplicationStatus,
 ): Result.Async<JobApplication, ActionError> {
   const session = await Session.get<UserSession>(cookies())
   if (!session.ok) return Result.error(ActionError.Unauthorized)

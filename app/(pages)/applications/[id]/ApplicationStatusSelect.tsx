@@ -1,5 +1,8 @@
 'use client'
 
+import RejectApplicationButton from '@/(pages)/applications/[id]/RejectApplicationButton'
+import { FullApplication } from '@/_api/applications'
+import api from '@/_api/client'
 import {
   applicationStatusColors,
   applicationStatusSelectedColors,
@@ -8,10 +11,10 @@ import {
 import { ApplicationStatus } from '@prisma/client'
 import clsx from 'clsx'
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
 
 interface ApplicationStatusSelectProps {
-  initialStatus: ApplicationStatus
+  initialApplication: FullApplication
 }
 
 const statuses: ApplicationStatus[] = [
@@ -19,31 +22,48 @@ const statuses: ApplicationStatus[] = [
   ApplicationStatus.InReview,
   ApplicationStatus.Interviewing,
   ApplicationStatus.Offered,
+  ApplicationStatus.Hired,
 ]
 
 export default function ApplicationStatusSelect({
-  initialStatus,
+  initialApplication,
 }: ApplicationStatusSelectProps): JSX.Element {
-  const [status, setStatus] = useState(initialStatus)
+  const { data: status, isLoading } = api.$use('getApplicationStatus', initialApplication.id)
 
   return (
-    <div className="flex items-stretch">
-      {statuses.map((s, i) => (
-        <motion.button
-          key={s}
-          className={clsx(
-            'flex-grow flex items-center justify-center px-4 font-medium transition-colors',
-            i === 0 && 'rounded-l-md',
-            i === statuses.length - 1 && 'rounded-r-md',
-            status === s ? applicationStatusSelectedColors[s] : applicationStatusColors[s]
-          )}
-          onClick={() => setStatus(s)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          {applicationStatuses[s]}
-        </motion.button>
-      ))}
-    </div>
+    <>
+      <div className="mb-2 mt-4 flex items-center gap-3">
+        <h2 className="text-xl font-semibold">Update Status</h2>
+
+        {isLoading && <Loader2 size={20} className="animate-spin" />}
+      </div>
+
+      <div className="flex flex-wrap gap-4">
+        <RejectApplicationButton application={initialApplication} />
+        <div className="flex items-stretch">
+          {statuses.map((s, i) => (
+            <motion.button
+              key={s}
+              className={clsx(
+                'flex flex-grow items-center justify-center px-4 font-medium transition-colors',
+                i === 0 && 'rounded-l-md',
+                i === statuses.length - 1 && 'rounded-r-md',
+                (status ?? initialApplication.status) === s
+                  ? applicationStatusSelectedColors[s]
+                  : applicationStatusColors[s],
+              )}
+              onClick={() => {
+                api.setApplicationStatus(initialApplication.id, s)
+                api.$mutate('getApplicationStatus', [initialApplication.id], s)
+              }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              {applicationStatuses[s]}
+            </motion.button>
+          ))}
+        </div>
+      </div>
+    </>
   )
 }

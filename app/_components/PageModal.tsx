@@ -1,6 +1,7 @@
 'use client'
 
 import Modal from '@/_components/Modal'
+import clsx from 'clsx'
 import { useRouter } from 'next/navigation'
 import React, { createContext, useEffect, useState } from 'react'
 
@@ -10,7 +11,12 @@ interface PageModalContext {
 
 export const PageModalContext = createContext<PageModalContext | null>(null)
 
-export default function PageModal({ children }: { children: React.ReactNode }): JSX.Element {
+interface PageModalProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export default function PageModal({ children, className }: PageModalProps): JSX.Element {
   const router = useRouter()
   const [open, setOpen] = useState(false)
 
@@ -25,7 +31,7 @@ export default function PageModal({ children }: { children: React.ReactNode }): 
       }}
     >
       <Modal
-        className="mt-12"
+        className={clsx('mt-12', className)}
         open={open}
         onClose={() => {
           setOpen(false)
