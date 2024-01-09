@@ -15,12 +15,12 @@ export default async function Page(): Promise<JSX.Element> {
   if (!user) {
     return notFound()
   }
-  const sensitive = (await server.getSensitiveData(user.id))!
+  const sensitive = (await server.getSensitiveData())!
   const passkeys = await server.getPasskeys()
 
   return (
     <>
-      <h1 className="text-3xl mb-8 font-semibold">Settings</h1>
+      <h1 className="mb-8 text-3xl font-semibold">Settings</h1>
 
       <div className={styles.settings}>
         <h2 className="text-2xl font-semibold">Profile</h2>

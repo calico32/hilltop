@@ -21,8 +21,12 @@ import {
   VerifyEmailError,
 } from '@/_api/types'
 import { prisma } from '@/_lib/database'
-import { sendEmail } from '@/_lib/email'
+import { sendEmail, transport } from '@/_lib/email'
+import { fullName } from '@/_lib/format'
+import { render } from '@react-email/render'
 import { Result, Session, decrypt, encrypt, expires } from 'kiyoi'
+import React from 'react'
+import ResetPassword from '../../emails/ResetPassword'
 import VerifyEmail from '../../emails/VerifyEmail'
 
 /**
@@ -45,7 +49,7 @@ export async function login(email: string, password: string): Result.Async<User,
       userId: user.id,
       role: user.role,
     },
-    [expires(60 * 60 * 24 * 30)]
+    [expires(60 * 60 * 24 * 30)],
   )
   await Session.save(session, cookies())
 
@@ -58,7 +62,7 @@ export async function logout(): Result.Async<void, never> {
 }
 
 export async function register(
-  data: RegisterData
+  data: RegisterData,
 ): Result.Async<Pick<User, 'id' | 'role'>, RegisterError> {
   const result = await RegisterData.safeParseAsync(data)
   if (!result.success) Result.error(RegisterError.InvalidData)
@@ -177,9 +181,9 @@ export async function verifyEmail(token: string): Result.Async<void, VerifyEmail
   return Result.ok()
 }
 
-export async function forgotPassword(email: string): Result.Async<void, never> {
+export async function forgotPassword(email: string): Result.Async<void, ActionError> {
   const user = await prisma.user.findUnique({ where: { email } })
-  if (!user) return Result.ok()
+  if (!user) return Result.error(ActionError.NotFound)
 
   const hash = crypto.createHash('sha256').update(user.password).digest('hex')
 
@@ -192,17 +196,19 @@ export async function forgotPassword(email: string): Result.Async<void, never> {
   const token = await encrypt(data)
 
   const url = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${encodeURIComponent(
-    token
+    token,
   )}`
 
-  // await transport.sendMail({
-  //   from: process.env.EMAIL_FROM,
-  //   replyTo: process.env.EMAIL_REPLY_TO,
-  //   to: user.email,
-  //   subject: 'Reset your password',
-  //   html: render(React.createElement(ResetPassword, { url })),
-  //   text: render(React.createElement(ResetPassword, { url }), { plainText: true }),
-  // })
+  await transport.sendMail({
+    from: process.env.EMAIL_FROM,
+    replyTo: process.env.EMAIL_REPLY_TO,
+    to: user.email,
+    subject: 'Reset your password',
+    html: render(React.createElement(ResetPassword, { name: fullName(user), url })),
+    text: render(React.createElement(ResetPassword, { name: fullName(user), url }), {
+      plainText: true,
+    }),
+  })
 
   return Result.ok()
 }
@@ -210,7 +216,7 @@ export async function forgotPassword(email: string): Result.Async<void, never> {
 export async function resetPassword(
   token: string,
   password: string,
-  confirmPassword: string
+  confirmPassword: string,
 ): Result.Async<void, PasswordResetError> {
   const data = await decrypt<PasswordResetData>(token)
   if (!data) return Result.error(PasswordResetError.InvalidToken)
@@ -231,7 +237,7 @@ export async function resetPassword(
 }
 
 export async function isPasswordResetTokenValid(
-  token: string
+  token: string,
 ): Result.Async<void, PasswordResetError> {
   const data = await decrypt<PasswordResetData>(token)
   if (!data) return Result.error(PasswordResetError.InvalidToken)
@@ -242,7 +248,7 @@ export async function isPasswordResetTokenValid(
   if (!user) return Result.error(PasswordResetError.InvalidToken)
 
   const tokenHash = crypto.createHash('sha256').update(user.password).digest('hex')
-  if (tokenHash !== data.hash) return Result.error(PasswordResetError.InvalidToken)
+  if (tokenHash !== data.hash) return Result.error(PasswordResetError.AlreadyUsed)
 
   return Result.ok()
 }

@@ -12,5 +12,3 @@ export default function Layout({
     </>
   )
 }
-
-//Make the repo public!

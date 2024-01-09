@@ -11,7 +11,7 @@ import { cookies } from 'next/headers'
 export const getUser = cache(
   'getUser',
   async (
-    id?: string
+    id?: string,
   ): Promise<(User & { applications: Pick<JobApplication, 'status'>[]; age: number }) | null> => {
     const session = await Session.get<UserSession>(cookies())
     if (!session.ok) return null
@@ -70,7 +70,7 @@ export const getUser = cache(
       }
 
     return null
-  }
+  },
 )
 
 export const getUsers = cache('getUsers', async () => {
@@ -89,7 +89,7 @@ export const getUsers = cache('getUsers', async () => {
   return users
 })
 
-export const getSensitiveData = cache('getSensitiveData', async (id: string) => {
+export const getSensitiveData = cache('getSensitiveData', async (id?: string) => {
   const session = await Session.get<UserSession>(cookies())
   if (!session.ok) return null
 
@@ -97,6 +97,7 @@ export const getSensitiveData = cache('getSensitiveData', async (id: string) => 
     const data = await prisma.user.findUnique({
       where: { id: session.value.userId },
       select: {
+        id: true,
         dob: true,
         taxId: true,
       },
@@ -105,16 +106,16 @@ export const getSensitiveData = cache('getSensitiveData', async (id: string) => 
     if (!data) return null
     const taxId = await decrypt<string>(data.taxId)
     return {
+      id: data.id,
       dob: await decrypt<string>(data.dob),
       taxId: `*****${taxId.slice(-4)}`,
     }
   }
 
-  if (session.value.role === Role.Applicant) return null
-
   const user = await prisma.user.findUnique({
     where: { id },
     select: {
+      id: true,
       role: true,
       dob: true,
       taxId: true,
@@ -123,6 +124,8 @@ export const getSensitiveData = cache('getSensitiveData', async (id: string) => 
   })
 
   if (!user) return null
+
+  if (session.value.userId !== user.id && session.value.role === Role.Applicant) return null
 
   if (
     session.value.role === Role.Admin ||

@@ -5,6 +5,7 @@ import { LoginError, PasskeyLoginError } from '@/_api/types'
 import Button from '@/_components/Button'
 import Input from '@/_components/Input'
 import { KeyRound } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -57,7 +58,7 @@ export default function LoginForm(): JSX.Element {
     <>
       <Button
         unstyled
-        className="flex items-center justify-center w-full gap-4 p-3 font-semibold text-white rounded-md bg-navyblue-0 hover:brightness-125"
+        className="flex w-full items-center justify-center gap-4 rounded-md bg-navyblue-0 p-3 font-semibold text-white hover:brightness-125"
         loading={passkeyLoading}
         onClick={async () => {
           setPasskeyLoading(true)
@@ -73,15 +74,15 @@ export default function LoginForm(): JSX.Element {
         <KeyRound strokeWidth={1.5} />
         <span>Sign in with Passkey</span>
       </Button>
-      {passkeyError && <p className="text-red-600 -mt-2">{passkeyError}</p>}
-      <div className="flex items-center w-full gap-2">
+      {passkeyError && <p className="-mt-2 text-red-600">{passkeyError}</p>}
+      <div className="flex w-full items-center gap-2">
         <hr className="flex-grow border-gray-400" />
         <span className="tracking-wider text-gray-400">OR</span>
         <hr className="flex-grow border-gray-400" />
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col gap-4">
         <FormProvider {...form}>
-          <div className="flex flex-col w-full">
+          <div className="flex w-full flex-col">
             <label htmlFor="email" className="text-lg font-semibold">
               Email
             </label>
@@ -93,7 +94,7 @@ export default function LoginForm(): JSX.Element {
             />
           </div>
 
-          <div className="flex flex-col w-full">
+          <div className="flex w-full flex-col">
             <label htmlFor="password" className="text-lg font-semibold">
               Password
             </label>
@@ -105,12 +106,20 @@ export default function LoginForm(): JSX.Element {
             />
           </div>
 
+          <div className="mt-2 text-center text-sm text-gray-500">
+            Forgot your password?{' '}
+            <Link href="/forgot-password" className="text-blue-600 underline">
+              Reset it
+            </Link>{' '}
+            here.
+          </div>
+
           <Button
             loading={isSubmitting}
             large
             color="accent"
             type="submit"
-            className="self-center p-3 px-10 mt-2 text-xl font-semibold rounded-md w-max"
+            className="mt-2 w-max self-center rounded-md p-3 px-10 text-xl font-semibold"
             disabled={isSubmitting}
           >
             Sign in
@@ -142,7 +151,7 @@ async function passkeyLogin({
     const credential = await navigator.credentials.get({ publicKey: options })
     if (!credential || !(credential instanceof PublicKeyCredential)) {
       setPasskeyError(
-        'The browser returned an invalid credential. Please try again or use a different device.'
+        'The browser returned an invalid credential. Please try again or use a different device.',
       )
       return
     }
@@ -152,7 +161,7 @@ async function passkeyLogin({
     const { response } = credential
     if (!(response instanceof AuthenticatorAssertionResponse)) {
       setPasskeyError(
-        'The browser returned an invalid response. Please try again or use a different device.'
+        'The browser returned an invalid response. Please try again or use a different device.',
       )
       return
     }
@@ -178,17 +187,17 @@ async function passkeyLogin({
       switch (result.error) {
         case PasskeyLoginError.ChallengeMismatch:
           setPasskeyError(
-            'The browser returned an invalid challenge response. Try again or using a different device.'
+            'The browser returned an invalid challenge response. Try again or using a different device.',
           )
           break
         case PasskeyLoginError.InvalidData:
           setPasskeyError(
-            'The browser returned an invalid response. Try again or using a different device.'
+            'The browser returned an invalid response. Try again or using a different device.',
           )
           break
         case PasskeyLoginError.PasskeyNotFound:
           setPasskeyError(
-            'The browser returned an invalid credential. Try again or using a different device.'
+            'The browser returned an invalid credential. Try again or using a different device.',
           )
           break
         case PasskeyLoginError.ServerError:
@@ -196,17 +205,17 @@ async function passkeyLogin({
           break
         case PasskeyLoginError.Unauthorized:
           setPasskeyError(
-            'The server rejected your passkey. Try again or using a different device.'
+            'The server rejected your passkey. Try again or using a different device.',
           )
           break
         case PasskeyLoginError.UnsupportedDevice:
           setPasskeyError(
-            'Your device may not be supported. Try again or using a different device.'
+            'Your device may not be supported. Try again or using a different device.',
           )
           break
         case PasskeyLoginError.VerificationFailed:
           setPasskeyError(
-            'The credential could not prove its authenticity. Try again or using a different device.'
+            'The credential could not prove its authenticity. Try again or using a different device.',
           )
           break
       }
@@ -223,11 +232,11 @@ async function passkeyLogin({
     if (!(err instanceof DOMException)) return
     if (err.name === 'InvalidStateError') {
       setPasskeyError(
-        'The browser reported an invalid state error. Try again or using a different device.'
+        'The browser reported an invalid state error. Try again or using a different device.',
       )
     } else if (err.name === 'NotAllowedError') {
       setPasskeyError(
-        'The operation timed out or the browser denied access to the authenticator. Try again or using a different device.'
+        'The operation timed out or the browser denied access to the authenticator. Try again or using a different device.',
       )
     } else {
       setPasskeyError(err.message)

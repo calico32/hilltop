@@ -70,6 +70,7 @@ export const PasswordResetError = Enum(ActionError, {
   InvalidToken: 'InvalidToken',
   ExpiredToken: 'ExpiredToken',
   PasswordMismatch: 'PasswordMismatch',
+  AlreadyUsed: 'AlreadyUsed',
 })
 
 /**
