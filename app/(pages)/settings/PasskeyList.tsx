@@ -10,7 +10,7 @@ interface PasskeyListProps {
 }
 
 export default function PasskeyList({ initialData }: PasskeyListProps): JSX.Element {
-  const { data: passkeyData, isLoading } = api.$use('getPasskeys')
+  const { data: passkeyData, isLoading } = api.passkeys.$use('getAll')
 
   // if (isLoading) {
   //   const data: Pick<Passkey, 'credentialId' | 'created' | 'updated' | 'transports' | 'nickname'> =
@@ -35,8 +35,8 @@ export default function PasskeyList({ initialData }: PasskeyListProps): JSX.Elem
     <>
       {!passkeys || passkeys.length === 0 ? (
         <>
-          <div className="bg-blue-50 p-4 border rounded-md text-blue-900 border-blue-700 mb-4 flex">
-            <Info size={24} className="inline-block mr-4" />
+          <div className="mb-4 flex rounded-md border border-blue-700 bg-blue-50 p-4 text-blue-900">
+            <Info size={24} className="mr-4 inline-block" />
             <span>
               Passkeys are a passwordless and more secure way to sign in to websites. Consider
               registering one today!

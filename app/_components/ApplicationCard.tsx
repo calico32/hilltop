@@ -1,4 +1,4 @@
-import { FullApplication } from '@/_api/applications'
+import { FullApplication } from '@/_api/applications/common'
 import { LinkButton } from '@/_components/Button'
 import { applicationStatusColors, applicationStatuses } from '@/_lib/data'
 import { avatar, fullName } from '@/_lib/format'
@@ -65,14 +65,14 @@ export default function ApplicationCard({
     })
 
     return (
-      <div className="relative flex gap-4 p-3 border border-gray-300 rounded-md shadow-md">
+      <div className="relative flex gap-4 rounded-md border border-gray-300 p-3 shadow-md">
         {showWarning && (
           <>
             {isMounted && (
               <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
                 <div
                   style={transitionStyles}
-                  className="p-3 bg-red-100 rounded-md shadow-md shadow-red-900/10 text-red-950 ounded-br-none w-max"
+                  className="ounded-br-none w-max rounded-md bg-red-100 p-3 text-red-950 shadow-md shadow-red-900/10"
                 >
                   <FloatingArrow
                     height={ARROW_HEIGHT}
@@ -85,16 +85,16 @@ export default function ApplicationCard({
                 </div>
               </div>
             )}
-            <div className="absolute w-4 h-4 bg-red-600 rounded-full -top-1 -right-1 animate-ping" />
+            <div className="absolute -right-1 -top-1 h-4 w-4 animate-ping rounded-full bg-red-600" />
             <div
-              className="absolute w-4 h-4 bg-red-600 rounded-full -top-1 -right-1"
+              className="absolute -right-1 -top-1 h-4 w-4 rounded-full bg-red-600"
               ref={refs.setReference}
               {...getReferenceProps()}
             />
           </>
         )}
-        <div className="flex flex-col gap-1 w-60">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="flex w-60 flex-col gap-1">
+          <div className="mb-2 flex items-center gap-3">
             <Image
               src={avatar(application.user)}
               alt=""
@@ -116,13 +116,13 @@ export default function ApplicationCard({
           <div className="text-sm italic text-gray-600">{truncate(application.user.bio, 100)}</div>
         </div>
         <div className="border-r border-gray-400" />
-        <div className="flex flex-col flex-grow gap-4">
+        <div className="flex flex-grow flex-col gap-4">
           <div className="flex items-center gap-4">
             <h1 className="text-2xl font-semibold">{application.listing.title}</h1>
             <span
               className={clsx(
-                'px-2.5 py-0.5 text-sm lowercase rounded-full border',
-                applicationStatusColors[application.status]
+                'rounded-full border px-2.5 py-0.5 text-sm lowercase',
+                applicationStatusColors[application.status],
               )}
             >
               {applicationStatuses[application.status]}
@@ -177,10 +177,10 @@ export default function ApplicationCard({
   }
 
   return (
-    <div className="flex flex-col gap-2 p-3 border border-gray-300 rounded-md shadow-md">
+    <div className="flex flex-col gap-2 rounded-md border border-gray-300 p-3 shadow-md">
       {currentUser && currentUser.id !== application.userId && (
         <Link
-          className="flex items-center gap-1 cursor-pointer hover:underline"
+          className="flex cursor-pointer items-center gap-1 hover:underline"
           href={`/profile/${application.userId}`}
         >
           <Image
@@ -188,7 +188,7 @@ export default function ApplicationCard({
             alt=""
             width={30}
             height={30}
-            className="self-center mr-2 rounded-full"
+            className="mr-2 self-center rounded-full"
           />
           <h1 className="text-xl font-medium">{fullName(application.user)}</h1>
         </Link>

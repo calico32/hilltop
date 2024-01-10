@@ -34,7 +34,7 @@ export default function LoginForm(): JSX.Element {
     //                      ^ not type-safe, can throw errors
 
     // we can do:
-    const result = await api.login(data.email, data.password)
+    const result = await api.auth.login(data.email, data.password)
     //    ^ Result<User, LoginError>
 
     if (!result.ok) {
@@ -49,7 +49,7 @@ export default function LoginForm(): JSX.Element {
       return
     }
 
-    await api.$mutate('getUser', [], result.value)
+    await api.users.$mutate('get', [], result.value)
     toast.success('Successfully logged in!')
     router.push('/dashboard')
   }
@@ -65,7 +65,7 @@ export default function LoginForm(): JSX.Element {
           const success = await passkeyLogin({ setPasskeyError })
           setPasskeyLoading(false)
           if (success) {
-            await api.$mutate('getUser', [], null)
+            await api.users.$mutate('get', [], null)
             toast.success('Successfully logged in!')
             router.push('/dashboard')
           }
@@ -137,7 +137,7 @@ async function passkeyLogin({
 }) {
   // 1. Let options be a new PublicKeyCredentialRequestOptions structure
   //    configured to the Relying Party's needs for the ceremony.
-  const options = await api.beginPasskeyLogin()
+  const options = await api.passkeys.beginLogin()
   // revive number[] to Uint8Array
   options.challenge = new Uint8Array(options.challenge as any)
   options.allowCredentials?.forEach((credential) => {
@@ -171,7 +171,7 @@ async function passkeyLogin({
     // (not used)
 
     // Steps 5 and onward are handled by the server.
-    const result = await api.passkeyLogin({
+    const result = await api.passkeys.login({
       challengeId: options.challengeId,
       id: credential.id,
       type: credential.type,

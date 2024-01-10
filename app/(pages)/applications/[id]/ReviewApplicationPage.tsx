@@ -1,4 +1,4 @@
-import { FullApplication } from '@/_api/applications'
+import { FullApplication } from '@/_api/applications/common'
 import { LinkButton } from '@/_components/Button'
 import FileCard from '@/_components/FileCard'
 import ModalAwareLink from '@/_components/ModalAwareLink'

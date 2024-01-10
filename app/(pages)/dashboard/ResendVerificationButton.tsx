@@ -24,7 +24,7 @@ export default function ResendVerificationButton(): JSX.Element {
       loading={loading}
       onClick={async () => {
         setLoading(true)
-        const res = await api.sendVerificationEmail()
+        const res = await api.auth.sendVerificationEmail()
         setLoading(false)
 
         if (res.ok) {
@@ -36,7 +36,7 @@ export default function ResendVerificationButton(): JSX.Element {
         switch (res.error) {
           case SendVerificationEmailError.ServerError:
             toast.error(
-              'An unexpected error occurred while sending the verification email. Please try again later.'
+              'An unexpected error occurred while sending the verification email. Please try again later.',
             )
             break
           case SendVerificationEmailError.Unauthorized:
@@ -47,7 +47,7 @@ export default function ResendVerificationButton(): JSX.Element {
             break
           case SendVerificationEmailError.SendEmailFailed:
             toast.error(
-              'The verification email could not be sent. Ensure your email is correct, or try again later.'
+              'The verification email could not be sent. Ensure your email is correct, or try again later.',
             )
             break
         }
@@ -56,7 +56,7 @@ export default function ResendVerificationButton(): JSX.Element {
     >
       <span className={cooldown > 0 ? 'invisible' : ''}>Resend</span>
       {cooldown > 0 && (
-        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           {cooldown}
         </span>
       )}

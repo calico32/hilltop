@@ -22,7 +22,7 @@ export default function ForgotPasswordForm(): JSX.Element {
   } = form
 
   const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
-    const result = await api.forgotPassword(data.email)
+    const result = await api.auth.forgotPassword(data.email)
 
     if (!result.ok) {
       switch (result.error) {

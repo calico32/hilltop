@@ -1,6 +1,6 @@
 'use client'
 
-import { FullApplication } from '@/_api/applications'
+import { FullApplication } from '@/_api/applications/common'
 import api from '@/_api/client'
 import Button from '@/_components/Button'
 import { avatar, fullName } from '@/_lib/format'
@@ -31,7 +31,7 @@ export default function ApplicationNotes({
   currentUser,
   initialData,
 }: ApplicationNotesProps): JSX.Element {
-  const { data: notes, isLoading } = api.$use('getApplicationNotes', applicationId)
+  const { data: notes, isLoading } = api.applications.$use('getNotes', applicationId)
   const [sort, setSort] = useState<'newest' | 'oldest'>('newest')
   const [isDeleting, setIsDeleting] = useState(false)
   const {
@@ -46,13 +46,13 @@ export default function ApplicationNotes({
         if (sort === 'newest') return b.created.getTime() - a.created.getTime()
         return a.created.getTime() - b.created.getTime()
       }),
-    [notes, sort, isLoading, initialData]
+    [notes, sort, isLoading, initialData],
   )
 
   return (
     <>
       <div className="flex items-center">
-        <h2 className="mt-4 mb-2 font-bold text-2xl flex gap-4 items-center">
+        <h2 className="mb-2 mt-4 flex items-center gap-4 text-2xl font-bold">
           Application Notes
           {isLoading && <Loader2 size={20} strokeWidth={1.5} className="animate-spin" />}
         </h2>
@@ -61,7 +61,7 @@ export default function ApplicationNotes({
         <Button
           color="neutral"
           small
-          className="flex items-center gap-1 shadow-none bg-opacity-50"
+          className="flex items-center gap-1 bg-opacity-50 shadow-none"
           onClick={() => setSort(sort === 'newest' ? 'oldest' : 'newest')}
         >
           {sort === 'newest' ? (
@@ -83,7 +83,7 @@ export default function ApplicationNotes({
       </div>
 
       {!sortedNotes.length && <p>There are no notes for this application.</p>}
-      <div className="grid sm:grid-cols-2 gap-4 grid-flow-dense">
+      <div className="grid grid-flow-dense gap-4 sm:grid-cols-2">
         <AnimatePresence>
           {sortedNotes.map((note, i) => (
             <motion.div
@@ -94,32 +94,32 @@ export default function ApplicationNotes({
               exit={{ opacity: 0, y: 0 }}
               className="hover-target h-max"
             >
-              <div className="flex flex-col items-start gap-2 p-4 border border-gray-300 rounded-lg bg-white h-max">
-                <div className="flex items-center gap-2 w-full">
+              <div className="flex h-max flex-col items-start gap-2 rounded-lg border border-gray-300 bg-white p-4">
+                <div className="flex w-full items-center gap-2">
                   <Image
                     src={avatar(note.author)}
                     alt=""
                     width={24}
                     height={24}
-                    className="float-left w-6 h-6 mt-px rounded-full"
+                    className="float-left mt-px h-6 w-6 rounded-full"
                   />
                   <Link
-                    className="font-semibold hover:underline flex-1"
+                    className="flex-1 font-semibold hover:underline"
                     href={'/profile/' + note.authorId}
                   >
                     {fullName(note.author)}
                   </Link>
                   {currentUser.id === note.authorId && (
                     <button
-                      className="text-gray-500 hover:text-red-700 hover-subject"
+                      className="hover-subject text-gray-500 hover:text-red-700"
                       onClick={async () => {
                         setIsDeleting(true)
-                        await api.deleteApplicationNote(note.id)
+                        await api.applications.deleteNote(note.id)
                         setIsDeleting(false)
-                        api.$mutate(
-                          'getApplicationNotes',
+                        api.applications.$mutate(
+                          'getNotes',
                           [note.applicationId],
-                          sortedNotes.filter((n) => n.id !== note.id)
+                          sortedNotes.filter((n) => n.id !== note.id),
                         )
                       }}
                     >
@@ -131,7 +131,7 @@ export default function ApplicationNotes({
                     </button>
                   )}
                 </div>
-                <span className="text-sm text-gray-500 mb-1">
+                <span className="mb-1 text-sm text-gray-500">
                   {formatDistanceToNow(note.created, { addSuffix: true })}
                 </span>
                 <Markdown className="prose max-w-none">{note.body}</Markdown>
@@ -142,16 +142,16 @@ export default function ApplicationNotes({
       </div>
 
       <form
-        className="flex gap-4 mt-6 relative h-max"
+        className="relative mt-6 flex h-max gap-4"
         onSubmit={handleSubmit(async (data) => {
-          const note = await api.addApplicationNote(applicationId, data.note)
+          const note = await api.applications.addNote(applicationId, data.note)
           if (!note.ok) {
             toast.error(note.error)
             return
           }
           reset()
-          api.$mutate(
-            'getApplicationNotes',
+          api.applications.$mutate(
+            'getNotes',
             [applicationId],
             [
               ...(notes ?? []),
@@ -162,14 +162,14 @@ export default function ApplicationNotes({
                 authorId: currentUser.id,
                 author: currentUser,
               },
-            ]
+            ],
           )
         })}
       >
-        <div className="flex flex-col flex-1 h-max">
+        <div className="flex h-max flex-1 flex-col">
           <input
             type="text"
-            className="border border-gray-400 rounded-lg pl-12 h-[50px]"
+            className="h-[50px] rounded-lg border border-gray-400 pl-12"
             placeholder="New note..."
             {...register('note', {
               required: "Note can't be empty",
@@ -177,8 +177,8 @@ export default function ApplicationNotes({
           />
           <span
             className={clsx(
-              'text-red-600 text-sm mt-1',
-              errors.note ? 'visible' : 'invisible pointer-events-none'
+              'mt-1 text-sm text-red-600',
+              errors.note ? 'visible' : 'pointer-events-none invisible',
             )}
           >
             {errors.note?.message ?? 'Hi'}
@@ -189,10 +189,10 @@ export default function ApplicationNotes({
           alt=""
           width={24}
           height={24}
-          className="absolute ml-2 rounded-full top-3 left-1"
+          className="absolute left-1 top-3 ml-2 rounded-full"
         />
         <Button
-          className="!px-5 h-[50px]"
+          className="h-[50px] !px-5"
           outlined
           color="accent"
           type="submit"

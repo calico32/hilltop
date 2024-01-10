@@ -3,7 +3,7 @@ import { avatar, fullName } from '@/_lib/format'
 import Image from 'next/image'
 
 export default async function Page({ params: { id } }: { params: { id: string } }) {
-  const user = (await server.getUser(id))!
+  const user = (await server.users.get(id))!
 
   return (
     <>
@@ -14,7 +14,7 @@ export default async function Page({ params: { id } }: { params: { id: string } 
           priority
           width={150}
           height={150}
-          className="self-center mr-2 rounded-full"
+          className="mr-2 self-center rounded-full"
         />
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-semibold">{fullName(user)}</h1>

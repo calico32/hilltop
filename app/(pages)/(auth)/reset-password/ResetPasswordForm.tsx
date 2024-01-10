@@ -26,7 +26,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps): JS
   } = form
 
   const onSubmit: SubmitHandler<ResetPasswordFormValues> = async (data) => {
-    const result = await api.resetPassword(token, data.password, data.confirmPassword)
+    const result = await api.auth.resetPassword(token, data.password, data.confirmPassword)
 
     if (!result.ok) {
       switch (result.error) {

@@ -20,7 +20,7 @@ interface AppBarMenuProps {
 }
 
 export default function AppBarMenu({ landing }: AppBarMenuProps): JSX.Element {
-  const { isLoading, data: user } = api.$use('getUser')
+  const { isLoading, data: user } = api.users.$use('get')
 
   const router = useRouter()
 
@@ -99,8 +99,8 @@ export default function AppBarMenu({ landing }: AppBarMenuProps): JSX.Element {
                       className="flex w-full items-center rounded-md px-2 py-2 ui-active:bg-red-200"
                       onClick={async () => {
                         const loading = toast.loading('Signing you out...')
-                        await api.logout()
-                        await api.$mutate('getUser', [], null)
+                        await api.auth.logout()
+                        await api.users.$mutate('get', [], null)
                         router.push('/')
                         toast.success('Signed out successfully. Have a nice day!', { id: loading })
                       }}

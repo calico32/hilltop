@@ -20,7 +20,7 @@ export default function VerifyEmailHandler(): JSX.Element {
     }
 
     const verify = async () => {
-      const res = await api.verifyEmail(token)
+      const res = await api.auth.verifyEmail(token)
 
       if (!res.ok) {
         switch (res.error) {

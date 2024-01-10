@@ -24,7 +24,7 @@ export default function DeletePasskeyButton({ passkey }: DeletePasskeyButtonProp
         color="danger"
         minimal
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center !p-3 h-max"
+        className="flex h-max items-center justify-center !p-3"
       >
         <Trash2 size={24} />
       </Button>
@@ -53,7 +53,7 @@ export default function DeletePasskeyButton({ passkey }: DeletePasskeyButtonProp
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="transform overflow-hidden bg-white rounded-md p-6 z-50 max-w-md sm:w-[28rem] flex flex-col gap-4 shadow-xl">
+                <Dialog.Panel className="z-50 flex max-w-md transform flex-col gap-4 overflow-hidden rounded-md bg-white p-6 shadow-xl sm:w-[28rem]">
                   <div className="flex items-center justify-between gap-4">
                     <Dialog.Title className="text-2xl font-semibold">Delete Passkey</Dialog.Title>
 
@@ -66,7 +66,7 @@ export default function DeletePasskeyButton({ passkey }: DeletePasskeyButtonProp
 
                   <p>
                     Are you sure you want to delete
-                    <span className="inline-block align-middle ml-1.5 mr-0.5">
+                    <span className="ml-1.5 mr-0.5 inline-block align-middle">
                       <PasskeyIcon transports={passkey.transports} size={20} />
                     </span>
                     <strong>{passkey.nickname ?? truncate(passkey.credentialId, 15)}</strong>? You
@@ -77,7 +77,7 @@ export default function DeletePasskeyButton({ passkey }: DeletePasskeyButtonProp
                     <strong>This action cannot be undone.</strong>
                   </p>
 
-                  <div className="text-gray-500 text-sm">
+                  <div className="text-sm text-gray-500">
                     <p>
                       ID: <code>{truncate(passkey.credentialId, 35)}</code>
                     </p>
@@ -89,7 +89,7 @@ export default function DeletePasskeyButton({ passkey }: DeletePasskeyButtonProp
                     {passkey.transports.length && <span>{passkey.transports.join(', ')}</span>}
                   </div>
 
-                  <div className="flex gap-4 items-center justify-center">
+                  <div className="flex items-center justify-center gap-4">
                     <Button
                       onClick={() => {
                         setOpen(false)
@@ -103,12 +103,12 @@ export default function DeletePasskeyButton({ passkey }: DeletePasskeyButtonProp
                     <Button
                       onClick={async () => {
                         setLoading(true)
-                        const res = await api.deletePasskey(passkey.credentialId)
+                        const res = await api.passkeys.delete(passkey.credentialId)
                         setLoading(false)
                         if (res.ok) {
                           setOpen(false)
                           toast.success('Passkey deleted.')
-                          api.$mutate('getPasskeys', [], null)
+                          api.passkeys.$mutate('getAll', [], null)
                         } else {
                           toast.error('Failed to delete passkey: ' + res.error)
                         }

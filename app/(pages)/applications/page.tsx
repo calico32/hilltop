@@ -1,6 +1,6 @@
 'use client'
 
-import { SearchApplicationQuery } from '@/_api/applications'
+import { SearchApplicationQuery } from '@/_api/applications/search'
 import api from '@/_api/client'
 import ApplicationCard from '@/_components/ApplicationCard'
 import Spinner from '@/_components/Spinner'
@@ -55,8 +55,8 @@ export default function Page(): JSX.Element {
     window.history.replaceState({}, '', path)
   }, [query])
 
-  const { data: applications, isLoading } = api.$use('searchApplications', query)
-  const { data: currentUser, isLoading: userLoading } = api.$use('getUser')
+  const { data: applications, isLoading } = api.applications.$use('search', query)
+  const { data: currentUser, isLoading: userLoading } = api.users.$use('get')
   //hi :)
   return (
     <>

@@ -11,12 +11,12 @@ export const metadata = {
 }
 
 export default async function Page(): Promise<JSX.Element> {
-  const user = await server.getUser()
+  const user = await server.users.get()
   if (!user) {
     return notFound()
   }
-  const sensitive = (await server.getSensitiveData())!
-  const passkeys = await server.getPasskeys()
+  const sensitive = (await server.users.getSensitiveData())!
+  const passkeys = await server.passkeys.getAll()
 
   return (
     <>

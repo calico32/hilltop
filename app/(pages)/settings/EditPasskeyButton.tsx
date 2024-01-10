@@ -27,7 +27,7 @@ export default function EditPasskeyButton({ passkey }: EditPasskeyButtonProps): 
         color="neutral"
         minimal
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center !p-3 h-max"
+        className="flex h-max items-center justify-center !p-3"
       >
         <Pencil size={24} />
       </Button>
@@ -56,7 +56,7 @@ export default function EditPasskeyButton({ passkey }: EditPasskeyButtonProps): 
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="transform overflow-hidden bg-white rounded-md p-6 z-50 max-w-md sm:w-[28rem] flex flex-col gap-4 shadow-xl">
+                <Dialog.Panel className="z-50 flex max-w-md transform flex-col gap-4 overflow-hidden rounded-md bg-white p-6 shadow-xl sm:w-[28rem]">
                   <div className="flex items-center justify-between gap-4">
                     <Dialog.Title className="text-2xl font-semibold">Edit Passkey</Dialog.Title>
 
@@ -84,7 +84,7 @@ export default function EditPasskeyButton({ passkey }: EditPasskeyButtonProps): 
                     />
                   </div>
 
-                  <div className="text-gray-500 text-sm">
+                  <div className="text-sm text-gray-500">
                     <p>
                       ID: <code>{truncate(passkey.credentialId, 35)}</code>
                     </p>
@@ -96,7 +96,7 @@ export default function EditPasskeyButton({ passkey }: EditPasskeyButtonProps): 
                     {passkey.transports.length && <span>{passkey.transports.join(', ')}</span>}
                   </div>
 
-                  <div className="flex gap-4 items-center justify-center">
+                  <div className="flex items-center justify-center gap-4">
                     <Button
                       onClick={() => {
                         setOpen(false)
@@ -110,15 +110,15 @@ export default function EditPasskeyButton({ passkey }: EditPasskeyButtonProps): 
                     <Button
                       onClick={async () => {
                         setLoading(true)
-                        const res = await api.nicknamePasskey(
+                        const res = await api.passkeys.nickname(
                           passkey.credentialId,
-                          nickname || null
+                          nickname || null,
                         )
                         setLoading(false)
                         if (res.ok) {
                           setOpen(false)
                           toast.success('Passkey renamed!')
-                          api.$mutate('getPasskeys', [], null)
+                          api.passkeys.$mutate('getAll', [], null)
                         } else {
                           toast.error('Failed to rename passkey: ' + res.error)
                         }

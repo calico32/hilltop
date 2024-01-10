@@ -24,7 +24,7 @@ export default function ResetPasswordHandler({
     }
 
     const verify = async () => {
-      const res = await api.isPasswordResetTokenValid(token)
+      const res = await api.auth.isPasswordResetTokenValid(token)
 
       if (!res.ok) {
         switch (res.error) {

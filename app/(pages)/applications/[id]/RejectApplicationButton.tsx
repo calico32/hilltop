@@ -1,6 +1,6 @@
 'use client'
 
-import { FullApplication } from '@/_api/applications'
+import { FullApplication } from '@/_api/applications/common'
 import Button from '@/_components/Button'
 import { avatar, fullName } from '@/_lib/format'
 import { Dialog, Transition } from '@headlessui/react'
@@ -86,7 +86,7 @@ export default function RejectApplicationButton({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="transform overflow-hidden bg-white rounded-md p-6 z-50 max-w-md sm:w-[28rem] flex flex-col gap-4 shadow-xl">
+                <Dialog.Panel className="z-50 flex max-w-md transform flex-col gap-4 overflow-hidden rounded-md bg-white p-6 shadow-xl sm:w-[28rem]">
                   <div className="flex items-center justify-between">
                     <Dialog.Title className="text-2xl font-semibold">
                       Reject Application
@@ -97,7 +97,7 @@ export default function RejectApplicationButton({
                     </button>
                   </div>
 
-                  <div className="flex gap-8 my-4 items-center justify-center">
+                  <div className="my-4 flex items-center justify-center gap-8">
                     <UserSquare size={72} strokeWidth={1.5} className="text-red-600" />
 
                     <Image
@@ -123,17 +123,17 @@ export default function RejectApplicationButton({
                       </p>
 
                       <textarea
-                        className="p-2 border border-gray-300 rounded-md"
+                        className="rounded-md border border-gray-300 p-2"
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
                         ref={rejectReasonRef}
                       />
 
                       {rejectReasonError && (
-                        <p className="text-red-600 -mt-2">{rejectReasonError}</p>
+                        <p className="-mt-2 text-red-600">{rejectReasonError}</p>
                       )}
 
-                      <div className="flex gap-4 items-center justify-center">
+                      <div className="flex items-center justify-center gap-4">
                         <Button onClick={closeDialog} minimal color="neutral">
                           Cancel
                         </Button>
@@ -141,7 +141,7 @@ export default function RejectApplicationButton({
                           onClick={() => {
                             if (rejectReason.length < 10) {
                               setRejectReasonError(
-                                'Please enter a reason with at least 10 characters.'
+                                'Please enter a reason with at least 10 characters.',
                               )
                               rejectReasonRef.current?.focus()
                               return
@@ -163,7 +163,7 @@ export default function RejectApplicationButton({
                         <strong>{application.listing.title}</strong> with the following reason:
                       </p>
 
-                      <blockquote className="border-l-4 border-red-600 pl-4 my-4">
+                      <blockquote className="my-4 border-l-4 border-red-600 pl-4">
                         {rejectReason}
                       </blockquote>
 
@@ -172,7 +172,7 @@ export default function RejectApplicationButton({
                         to the applicant and cannot be undone.
                       </p>
 
-                      <div className="flex gap-4 items-center justify-center">
+                      <div className="flex items-center justify-center gap-4">
                         <Button
                           onClick={() => {
                             closeDialog()

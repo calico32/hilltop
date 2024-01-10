@@ -23,7 +23,7 @@ export default function NavLink({
   recruiterText,
 }: NavLinkProps): JSX.Element {
   const path = usePathname()
-  const { data: user } = api.$use('getUser')
+  const { data: user } = api.users.$use('get')
 
   let content = children
   if (adminText && user?.role === Role.Admin) {
@@ -37,11 +37,11 @@ export default function NavLink({
       href={href}
       className={clsx(
         'pb-0.5',
-        'hover:text-gray-900 dark:hover:text-white border-b-4 drop-shadow-xl',
+        'border-b-4 drop-shadow-xl hover:text-gray-900 dark:hover:text-white',
         path === href
-          ? 'text-black dark:text-white font-medium border-black dark:border-white'
-          : 'text-gray-600 dark:text-gray-300 border-transparent',
-        className
+          ? 'border-black font-medium text-black dark:border-white dark:text-white'
+          : 'border-transparent text-gray-600 dark:text-gray-300',
+        className,
       )}
     >
       {content}

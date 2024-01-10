@@ -1,8 +1,9 @@
 import Button, { ButtonProps } from '@/_components/Button'
+import { notFound } from 'next/navigation'
 
 function variant<K extends keyof ButtonProps>(
   key: K,
-  values: ButtonProps[K][]
+  values: ButtonProps[K][],
 ): Partial<ButtonProps>[]
 function variant(values: Partial<ButtonProps>[]): Partial<ButtonProps>[]
 function variant(key: string | Partial<ButtonProps>[], values?: any): Partial<ButtonProps>[] {
@@ -16,7 +17,7 @@ function variant(key: string | Partial<ButtonProps>[], values?: any): Partial<Bu
 
 function chunks<E extends unknown>(arr: E[], size: number): E[][] {
   return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-    arr.slice(i * size, i * size + size)
+    arr.slice(i * size, i * size + size),
   )
 }
 
@@ -43,6 +44,10 @@ export const metadata = {
 }
 
 export default function Page(): JSX.Element {
+  if (process.env.NODE_ENV === 'production') {
+    return notFound()
+  }
+
   const color = variant('color', ['primary', 'accent', 'danger', 'warning', 'neutral'])
   const style = variant([{}, { outlined: true }, { minimal: true }])
   const size = variant([{ large: true }, {}, { small: true }])

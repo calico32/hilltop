@@ -9,7 +9,6 @@ import Input from '@/_components/Input'
 import { states } from '@/_lib/data'
 import { groupedNumberOnChange } from '@/_util/grouped-number-input'
 
-import { developmentDeleteUser } from '@/_api/auth'
 import { RegisterData, RegisterError } from '@/_api/types'
 import Button from '@/_components/Button'
 import { useState } from 'react'
@@ -40,7 +39,7 @@ export default function RegisterForm(): JSX.Element {
   } = form
 
   const onSubmit = async (data: RegisterFormValues) => {
-    const result = await api.register(data)
+    const result = await api.auth.register(data)
     if (!result.ok) {
       switch (result.error) {
         case RegisterError.ServerError:
@@ -63,7 +62,7 @@ export default function RegisterForm(): JSX.Element {
             'You have successfully registered, but we were unable to send you a verification email.',
             {
               icon: '📧',
-            }
+            },
           )
       }
 
@@ -74,14 +73,14 @@ export default function RegisterForm(): JSX.Element {
   }
 
   return (
-    <form className={clsx('gap-4 w-full', styles.registerForm)} onSubmit={handleSubmit(onSubmit)}>
+    <form className={clsx('w-full gap-4', styles.registerForm)} onSubmit={handleSubmit(onSubmit)}>
       <FormProvider {...form}>
-        <h2 className="col-start-1 col-span-2 text-2xl font-bold">About You</h2>
-        <label className="font-semibold my-auto text-right">
+        <h2 className="col-span-2 col-start-1 text-2xl font-bold">About You</h2>
+        <label className="my-auto text-right font-semibold">
           Legal Name{<Required />}{' '}
           <label>Enter your name as it appears on your government-issued ID.</label>
         </label>
-        <div className="flex items-start gap-2 h-max">
+        <div className="flex h-max items-start gap-2">
           <Input<RegisterFormValues>
             className="flex-1"
             type="text"
@@ -122,7 +121,7 @@ export default function RegisterForm(): JSX.Element {
             }}
           />
         </div>
-        <label className="font-semibold my-auto text-right">
+        <label className="my-auto text-right font-semibold">
           Preferred Name
           <label>
             Enter the name you would like to be called by. If you don't have one, leave this blank.
@@ -143,7 +142,7 @@ export default function RegisterForm(): JSX.Element {
             },
           }}
         />
-        <label className="font-semibold my-auto text-right">Date of Birth{<Required />}</label>
+        <label className="my-auto text-right font-semibold">Date of Birth{<Required />}</label>
         <Input<RegisterFormValues>
           type="date"
           name="dob"
@@ -151,7 +150,7 @@ export default function RegisterForm(): JSX.Element {
             required: 'A date of birth is required.',
           }}
         />
-        <label className="font-semibold my-auto text-right">
+        <label className="my-auto text-right font-semibold">
           Tax ID{<Required />}
           <label>
             Enter your Social Security Number (SSN) or Individual Taxpayer Identification Number
@@ -169,11 +168,11 @@ export default function RegisterForm(): JSX.Element {
               message: 'Please enter a valid 9-digit tax ID.',
             },
             onChange: groupedNumberOnChange([3, 2, 4], '-', (value) =>
-              setValue('taxId', value, { shouldValidate: true })
+              setValue('taxId', value, { shouldValidate: true }),
             ),
           }}
         />
-        <label className="font-semibold my-auto text-right">Street Address{<Required />}</label>
+        <label className="my-auto text-right font-semibold">Street Address{<Required />}</label>
         <div className="flex flex-col gap-2">
           <Input<RegisterFormValues>
             name="address1"
@@ -198,12 +197,12 @@ export default function RegisterForm(): JSX.Element {
               },
             }}
           />
-          <div className="flex gap-2 h-max flex-col xs:flex-row">
+          <div className="flex h-max flex-col gap-2 xs:flex-row">
             <Input<RegisterFormValues>
               name="city"
               type="text"
               placeholder="City"
-              className="flex-grow w-full"
+              className="w-full flex-grow"
               rules={{
                 required: 'A city is required.',
                 minLength: {
@@ -212,7 +211,7 @@ export default function RegisterForm(): JSX.Element {
                 },
               }}
             />
-            <div className="flex gap-2 h-max flex-row w-full">
+            <div className="flex h-max w-full flex-row gap-2">
               <Input<RegisterFormValues, true>
                 select
                 name="state"
@@ -240,7 +239,7 @@ export default function RegisterForm(): JSX.Element {
               <Input<RegisterFormValues>
                 name="zip"
                 type="text"
-                className="xs:w-24 flex-grow"
+                className="flex-grow xs:w-24"
                 placeholder="ZIP"
                 rules={{
                   required: 'A ZIP code is required.',
@@ -258,8 +257,8 @@ export default function RegisterForm(): JSX.Element {
           </div>
         </div>
 
-        <h2 className="col-start-1 col-span-2 text-2xl font-bold">Contacting You</h2>
-        <label className="font-semibold my-auto text-right">
+        <h2 className="col-span-2 col-start-1 text-2xl font-bold">Contacting You</h2>
+        <label className="my-auto text-right font-semibold">
           Email Address{<Required />}
           <label>You'll use this email address to log in to your account.</label>
         </label>
@@ -276,7 +275,7 @@ export default function RegisterForm(): JSX.Element {
           }}
         />
 
-        <label className="font-semibold my-auto text-right">
+        <label className="my-auto text-right font-semibold">
           Phone Number (US only)
           <label>If you do not have a US phone number, leave this field blank.</label>
         </label>
@@ -290,14 +289,14 @@ export default function RegisterForm(): JSX.Element {
               message: 'Please enter a valid phone number.',
             },
             onChange: groupedNumberOnChange([3, 3, 4], '-', (value) =>
-              setValue('phone', value, { shouldValidate: true })
+              setValue('phone', value, { shouldValidate: true }),
             ),
           }}
         />
 
-        <h2 className="col-start-1 col-span-2 text-2xl font-bold mt-8">Logging In</h2>
+        <h2 className="col-span-2 col-start-1 mt-8 text-2xl font-bold">Logging In</h2>
 
-        <label className="font-semibold my-auto text-right">
+        <label className="my-auto text-right font-semibold">
           Password{<Required />}
           <label>
             Your password must be at least 8 characters long and contain at least 1 uppercase
@@ -322,7 +321,7 @@ export default function RegisterForm(): JSX.Element {
           }}
         />
 
-        <label className="font-semibold my-auto text-right">
+        <label className="my-auto text-right font-semibold">
           Confirm Password{<Required />}
           <label>Re-enter your password to confirm.</label>
         </label>
@@ -336,9 +335,9 @@ export default function RegisterForm(): JSX.Element {
           }}
         />
 
-        <h2 className="col-start-1 col-span-2 text-2xl font-bold mt-8">Agreements</h2>
+        <h2 className="col-span-2 col-start-1 mt-8 text-2xl font-bold">Agreements</h2>
 
-        <label className="font-semibold text-right md:mt-0 mt-4">
+        <label className="mt-4 text-right font-semibold md:mt-0">
           Terms of Service{<Required />}
         </label>
         <label className="cursor-pointer">
@@ -353,15 +352,15 @@ export default function RegisterForm(): JSX.Element {
           <a
             href="/terms"
             target="_blank"
-            className="underline text-blue-600 inline-flex items-center gap-0.5"
+            className="inline-flex items-center gap-0.5 text-blue-600 underline"
           >
             Terms of Service <ArrowUpRightSquare size={16} />
           </a>
           .
-          {errors.terms && <span className="text-red-500 error block">{errors.terms.message}</span>}
+          {errors.terms && <span className="error block text-red-500">{errors.terms.message}</span>}
         </label>
 
-        <label className="font-semibold text-right md:mt-0 mt-4">
+        <label className="mt-4 text-right font-semibold md:mt-0">
           Privacy Policy{<Required />}
         </label>
         <label className="cursor-pointer">
@@ -376,17 +375,17 @@ export default function RegisterForm(): JSX.Element {
           <a
             href="/privacy"
             target="_blank"
-            className="underline text-blue-600 inline-flex items-center gap-0.5"
+            className="inline-flex items-center gap-0.5 text-blue-600 underline"
           >
             Privacy Policy <ArrowUpRightSquare size={16} />
           </a>
           .
           {errors.privacy && (
-            <span className="text-red-500 error block">{errors.privacy.message}</span>
+            <span className="error block text-red-500">{errors.privacy.message}</span>
           )}
         </label>
 
-        <label className="font-semibold text-right md:mt-0 mt-4">Disclaimer{<Required />}</label>
+        <label className="mt-4 text-right font-semibold md:mt-0">Disclaimer{<Required />}</label>
         <label className="cursor-pointer">
           <input
             type="checkbox"
@@ -399,18 +398,18 @@ export default function RegisterForm(): JSX.Element {
           <a
             href="/disclaimer"
             target="_blank"
-            className="underline text-blue-600 inline-flex items-center gap-0.5"
+            className="inline-flex items-center gap-0.5 text-blue-600 underline"
           >
             Disclaimer <ArrowUpRightSquare size={16} />
           </a>
           . I understand that Hilltop is not a real hiring platform, and that no real jobs are
           offered on this site.
           {errors.disclaimer && (
-            <span className="text-red-500 error block">{errors.disclaimer.message}</span>
+            <span className="error block text-red-500">{errors.disclaimer.message}</span>
           )}
         </label>
 
-        <label className="font-semibold text-right md:mt-0 mt-4">Email Updates</label>
+        <label className="mt-4 text-right font-semibold md:mt-0">Email Updates</label>
         <label className="cursor-pointer">
           <input type="checkbox" className="mr-2" {...register('emailUpdates')} />I would like to
           receive email updates about available jobs and product updates.
@@ -418,8 +417,8 @@ export default function RegisterForm(): JSX.Element {
 
         {process.env.NODE_ENV === 'development' && (
           <>
-            <div className="col-span-2 w-full flex justify-around gap-2 items-baseline mt-8">
-              <span className="italic text-gray-500 text-lg">Developer tools:</span>
+            <div className="col-span-2 mt-8 flex w-full items-baseline justify-around gap-2">
+              <span className="text-lg italic text-gray-500">Developer tools:</span>
               <Button
                 type="button"
                 color="accent"
@@ -467,7 +466,9 @@ export default function RegisterForm(): JSX.Element {
                 loading={deletingUser}
                 onClick={async () => {
                   setDeletingUser?.(true)
-                  const res = await developmentDeleteUser(process.env.NEXT_PUBLIC_DELETE_USER_KEY!)
+                  const res = await api.auth.developmentDeleteUser(
+                    process.env.NEXT_PUBLIC_DELETE_USER_KEY!,
+                  )
                   setDeletingUser?.(false)
 
                   if (!res.ok) {
@@ -489,7 +490,7 @@ export default function RegisterForm(): JSX.Element {
           color="primary"
           large
           loading={isSubmitting}
-          className="col-start-1 col-span-2 w-max mx-auto mt-8 text-lg hover:brightness-110"
+          className="col-span-2 col-start-1 mx-auto mt-8 w-max text-lg hover:brightness-110"
           disabled={isSubmitting}
         >
           Register

@@ -9,12 +9,12 @@ export const metadata = {
 
 export default async function Page({ params }: { params: { id: string } }): Promise<JSX.Element> {
   if (!params.id) return notFound()
-  const application = await server.getApplication(params.id)
+  const application = await server.applications.get(params.id)
   if (!application) return notFound()
-  const currentUser = (await server.getUser())!
+  const currentUser = (await server.users.get())!
 
   if (currentUser.role !== Role.Applicant) {
-    const applicantInfo = await server.getSensitiveData(application.user.id)
+    const applicantInfo = await server.users.getSensitiveData(application.user.id)
     return (
       <ReviewApplicationPage
         application={application}

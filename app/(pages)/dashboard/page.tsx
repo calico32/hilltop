@@ -16,7 +16,7 @@ export const metadata = {
 }
 
 export default async function Page(): Promise<JSX.Element> {
-  const user = await server.getUser()
+  const user = await server.users.get()
 
   if (!user) {
     return (
@@ -35,9 +35,9 @@ export default async function Page(): Promise<JSX.Element> {
         height={2100}
         priority
         alt="background"
-        className="absolute -z-10 w-full brightness-75 object-cover object-center bleed-full h-[300px]"
+        className="bleed-full absolute -z-10 h-[300px] w-full object-cover object-center brightness-75"
       />
-      <div className="text-3xl mt-10 mb-28 bg-white/80 backdrop-blur-sm p-4 rounded-md shadow-md flex gap-4 items-center">
+      <div className="mb-28 mt-10 flex items-center gap-4 rounded-md bg-white/80 p-4 text-3xl shadow-md backdrop-blur-sm">
         <Image src={avatar(user)} width={48} height={48} alt="avatar" className="rounded-full" />
         <h1>
           Welcome, <span className="font-semibold">{displayName(user)}</span>
@@ -51,7 +51,7 @@ export default async function Page(): Promise<JSX.Element> {
             appNum={user.applications.length}
           />
         )}
-        <div className="text-emeraldgreen-1 pt-3">
+        <div className="pt-3 text-emeraldgreen-1">
           <p>
             <Link href="/applications">
               {user.role === Role.Admin ? (
@@ -68,7 +68,7 @@ export default async function Page(): Promise<JSX.Element> {
           </p>
         </div>
       </div>
-      <div className="text-emeraldgreen-1 pt-3 text-xl underline">
+      <div className="pt-3 text-xl text-emeraldgreen-1 underline">
         <Link href="https://www.livecardinal.com/community/hillside-senior-living/">
           <p className="text-center">Learn More About Hillside</p>
         </Link>

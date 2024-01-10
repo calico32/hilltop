@@ -1,7 +1,7 @@
 'use client'
 
 import RejectApplicationButton from '@/(pages)/applications/[id]/RejectApplicationButton'
-import { FullApplication } from '@/_api/applications'
+import { FullApplication } from '@/_api/applications/common'
 import api from '@/_api/client'
 import {
   applicationStatusColors,
@@ -28,7 +28,7 @@ const statuses: ApplicationStatus[] = [
 export default function ApplicationStatusSelect({
   initialApplication,
 }: ApplicationStatusSelectProps): JSX.Element {
-  const { data: status, isLoading } = api.$use('getApplicationStatus', initialApplication.id)
+  const { data: status, isLoading } = api.applications.$use('getStatus', initialApplication.id)
 
   return (
     <>
@@ -53,8 +53,8 @@ export default function ApplicationStatusSelect({
                   : applicationStatusColors[s],
               )}
               onClick={() => {
-                api.setApplicationStatus(initialApplication.id, s)
-                api.$mutate('getApplicationStatus', [initialApplication.id], s)
+                api.applications.setStatus(initialApplication.id, s)
+                api.applications.$mutate('getStatus', [initialApplication.id], s)
               }}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}

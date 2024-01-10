@@ -12,14 +12,14 @@ async function test({ setStep, setFailureReason, credentialId }: RegisterPasskey
   if (!credentialId) {
     setStep(RegisterPasskeyStep.Failure)
     setFailureReason(
-      'An internal error occurred. Please contact the server administrator for assistance.'
+      'An internal error occurred. Please contact the server administrator for assistance.',
     )
     return
   }
 
   // 1. Let options be a new PublicKeyCredentialRequestOptions structure
   //    configured to the Relying Party's needs for the ceremony.
-  const result = await api.beginPasskeyTest(credentialId)
+  const result = await api.passkeys.beginTest(credentialId)
   if (!result.ok) {
     setStep(RegisterPasskeyStep.Failure)
     setFailureReason(result.error)
@@ -40,7 +40,7 @@ async function test({ setStep, setFailureReason, credentialId }: RegisterPasskey
     if (!credential || !(credential instanceof PublicKeyCredential)) {
       setStep(RegisterPasskeyStep.Failure)
       setFailureReason(
-        'The browser returned an invalid credential. Try registering your passkey again or using a different device.'
+        'The browser returned an invalid credential. Try registering your passkey again or using a different device.',
       )
       return
     }
@@ -51,7 +51,7 @@ async function test({ setStep, setFailureReason, credentialId }: RegisterPasskey
     if (!(response instanceof AuthenticatorAssertionResponse)) {
       setStep(RegisterPasskeyStep.Failure)
       setFailureReason(
-        'The browser returned an invalid response. Try registering your passkey again or using a different device.'
+        'The browser returned an invalid response. Try registering your passkey again or using a different device.',
       )
       return
     }
@@ -61,7 +61,7 @@ async function test({ setStep, setFailureReason, credentialId }: RegisterPasskey
     // (not used)
 
     // Steps 5 and onward are handled by the server.
-    const result = await api.testPasskey({
+    const result = await api.passkeys.test({
       challengeId: options.challengeId,
       id: credential.id,
       type: credential.type,
@@ -78,37 +78,37 @@ async function test({ setStep, setFailureReason, credentialId }: RegisterPasskey
       switch (result.error) {
         case PasskeyLoginError.ChallengeMismatch:
           setFailureReason(
-            'The browser returned an invalid challenge response. Try registering your passkey again or using a different device.'
+            'The browser returned an invalid challenge response. Try registering your passkey again or using a different device.',
           )
           break
         case PasskeyLoginError.InvalidData:
           setFailureReason(
-            'The browser returned an invalid response. Try registering your passkey again or using a different device.'
+            'The browser returned an invalid response. Try registering your passkey again or using a different device.',
           )
           break
         case PasskeyLoginError.PasskeyNotFound:
           setFailureReason(
-            'The browser returned an invalid credential. Try registering your passkey again or using a different device.'
+            'The browser returned an invalid credential. Try registering your passkey again or using a different device.',
           )
           break
         case PasskeyLoginError.ServerError:
           setFailureReason(
-            'The server encountered an error. Try registering your passkey again or using a different device.'
+            'The server encountered an error. Try registering your passkey again or using a different device.',
           )
           break
         case PasskeyLoginError.Unauthorized:
           setFailureReason(
-            'The server rejected your passkey. Try registering your passkey again or using a different device.'
+            'The server rejected your passkey. Try registering your passkey again or using a different device.',
           )
           break
         case PasskeyLoginError.UnsupportedDevice:
           setFailureReason(
-            'Your device may not be supported. Try registering your passkey again or using a different device.'
+            'Your device may not be supported. Try registering your passkey again or using a different device.',
           )
           break
         case PasskeyLoginError.VerificationFailed:
           setFailureReason(
-            'The credential could not prove its authenticity. Try registering your passkey again or using a different device.'
+            'The credential could not prove its authenticity. Try registering your passkey again or using a different device.',
           )
           break
       }
@@ -126,11 +126,11 @@ async function test({ setStep, setFailureReason, credentialId }: RegisterPasskey
     setStep(RegisterPasskeyStep.Failure)
     if (err.name === 'InvalidStateError') {
       setFailureReason(
-        'The browser reported an invalid state error. Try registering your passkey again or using a different device.'
+        'The browser reported an invalid state error. Try registering your passkey again or using a different device.',
       )
     } else if (err.name === 'NotAllowedError') {
       setFailureReason(
-        'The operation timed out or the browser denied access to the authenticator. Try registering your passkey again or using a different device.'
+        'The operation timed out or the browser denied access to the authenticator. Try registering your passkey again or using a different device.',
       )
     } else {
       setFailureReason(err.message)
@@ -163,7 +163,7 @@ export default function RegisterPasskeyTesting(props: RegisterPasskeyStepProps):
         test.
       </p>
 
-      <div className="flex gap-4 items-center justify-center">
+      <div className="flex items-center justify-center gap-4">
         <Button
           onClick={() => {
             setStep(RegisterPasskeyStep.Nickname)

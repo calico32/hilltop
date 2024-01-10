@@ -43,7 +43,7 @@ export default function RegisterPasskeyNickname({
         />
       </div>
 
-      <div className="flex gap-4 items-center justify-center">
+      <div className="flex items-center justify-center gap-4">
         <Button
           onClick={() => {
             setStep(RegisterPasskeyStep.Success)
@@ -61,7 +61,7 @@ export default function RegisterPasskeyNickname({
               setFailureReason('An internal error occurred. Please try again later.')
               return
             }
-            const res = await api.nicknamePasskey(credentialId, nickname)
+            const res = await api.passkeys.nickname(credentialId, nickname)
             if (!res.ok) {
               setStep(RegisterPasskeyStep.Failure)
               setFailureReason(res.error)

@@ -22,7 +22,7 @@ interface AppBarMobileMenuProps {
 export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JSX.Element {
   const router = useRouter()
   const [open, setOpen] = useState(false)
-  const { data: user, isLoading } = api.$use('getUser')
+  const { data: user, isLoading } = api.users.$use('get')
   const pathname = usePathname()
   const [signingOut, setSigningOut] = useState(false)
 
@@ -34,12 +34,12 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
         pathname !== '/register' ? (
           <Link
             href="/register"
-            className="block px-4 py-2 ml-4 mr-2 font-semibold text-white rounded-md bg-navyblue-0 hover:brightness-105"
+            className="ml-4 mr-2 block rounded-md bg-navyblue-0 px-4 py-2 font-semibold text-white hover:brightness-105"
           >
             Get started
           </Link>
         ) : (
-          <Link href="/login" className={clsx(landing ? '' : 'text-navyblue-0 font-semibold mr-2')}>
+          <Link href="/login" className={clsx(landing ? '' : 'mr-2 font-semibold text-navyblue-0')}>
             Sign in
           </Link>
         )
@@ -50,13 +50,13 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
           width={32}
           height={32}
           className={clsx(
-            'self-center rounded-full mr-2',
-            landing ? 'shadow' : 'border-gray-400 border-2'
+            'mr-2 self-center rounded-full',
+            landing ? 'shadow' : 'border-2 border-gray-400',
           )}
         />
       )}
       <button
-        className="flex items-baseline justify-center rounded-md p-1.5 self-center"
+        className="flex items-baseline justify-center self-center rounded-md p-1.5"
         onClick={() => setOpen(true)}
         aria-label="Open menu"
       >
@@ -85,11 +85,11 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
             leaveFrom="transform opacity-100 translate-y-0"
             leaveTo="transform opacity-0 -translate-y-full"
           >
-            <div className="fixed top-0 left-0 right-0 w-screen">
-              <Dialog.Panel className="w-full p-4 bg-white divide-y-2 divide-gray-200">
+            <div className="fixed left-0 right-0 top-0 w-screen">
+              <Dialog.Panel className="w-full divide-y-2 divide-gray-200 bg-white p-4">
                 <div>
-                  <div className="flex items-baseline h-full">
-                    <Link href="/" className="self-center mr-4">
+                  <div className="flex h-full items-baseline">
+                    <Link href="/" className="mr-4 self-center">
                       <Logo size={36} />
                     </Link>
                     <Link href="/">
@@ -103,7 +103,7 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
                       <X size={24} strokeWidth={1.5} />
                     </button>
                   </div>
-                  <div className="flex flex-col gap-3 mt-6 mb-4">
+                  <div className="mb-4 mt-6 flex flex-col gap-3">
                     <NavLink className="w-max" href="/jobs">
                       Search Jobs
                     </NavLink>
@@ -122,7 +122,7 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
 
                       <Link
                         href="/register"
-                        className="block px-4 py-2 ml-4 font-semibold text-white rounded-md bg-navyblue-0 hover:brightness-105"
+                        className="ml-4 block rounded-md bg-navyblue-0 px-4 py-2 font-semibold text-white hover:brightness-105"
                       >
                         Get started
                       </Link>
@@ -131,7 +131,7 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
                 </div>
                 {user && (
                   <div>
-                    <div className="flex items-center gap-4 mt-4">
+                    <div className="mt-4 flex items-center gap-4">
                       <Image
                         src={avatar(user)}
                         alt=""
@@ -149,12 +149,12 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
                           loading={signingOut}
                           color="danger"
                           minimal
-                          className="flex items-center w-full px-6 py-2 text-base rounded-md"
+                          className="flex w-full items-center rounded-md px-6 py-2 text-base"
                           onClick={async () => {
                             setSigningOut(true)
                             const loading = toast.loading('Signing you out...')
-                            await api.logout()
-                            await api.$mutate('getUser', [], null)
+                            await api.auth.logout()
+                            await api.users.$mutate('get', [], null)
                             router.push('/')
                             toast.success('Signed out successfully. Have a nice day!', {
                               id: loading,
@@ -162,7 +162,7 @@ export default function AppBarMobileMenu({ landing }: AppBarMobileMenuProps): JS
                           }}
                         >
                           <span>Sign out</span>
-                          <LogOut className="w-5 h-5 ml-3" aria-hidden="true" />
+                          <LogOut className="ml-3 h-5 w-5" aria-hidden="true" />
                         </Button>
                       </div>
                     </div>
