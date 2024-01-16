@@ -1,3 +1,5 @@
+'use server'
+
 import { ActionError } from '@/_api/types'
 import { caching, prisma } from '@/_lib/database'
 import { Result, Session } from 'kiyoi'

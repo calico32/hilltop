@@ -4,11 +4,11 @@ import { Prisma, User } from '@prisma/client'
 import * as bcrypt from 'bcryptjs'
 import { cookies } from 'next/headers'
 
-import { LoginError, RegisterData, RegisterError, VerifyEmailData } from '@/_api/types'
+import { LoginError, RegisterData, RegisterError, VerifyEmailData } from '@/_api/auth/_types'
 import { prisma } from '@/_lib/database'
 import { sendEmail } from '@/_lib/email'
+import VerifyEmail from '@emails/VerifyEmail'
 import { Result, Session, encrypt, expires } from 'kiyoi'
-import VerifyEmail from '../../../emails/VerifyEmail'
 
 /**
  * Authenticates a user with the provided email and password.

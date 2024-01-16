@@ -1,8 +1,8 @@
+import ReviewApplicationPage from '@/(pages)/applications/[id]/ReviewApplicationPage'
 import server from '@/_api/server'
 import PageModal from '@/_components/PageModal'
 import { Role } from '@prisma/client'
 import { notFound } from 'next/navigation'
-import ReviewApplicationPage from '../../[id]/ReviewApplicationPage'
 
 export default async function Page({ params }: { params: { id: string } }): Promise<JSX.Element> {
   if (!params.id) return notFound()

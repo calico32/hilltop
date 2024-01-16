@@ -1,7 +1,8 @@
 'use client'
 
+import { LoginError } from '@/_api/auth/_types'
 import api from '@/_api/client'
-import { LoginError, PasskeyLoginError } from '@/_api/types'
+import { PasskeyLoginError } from '@/_api/passkeys/_types'
 import Button from '@/_components/Button'
 import Input from '@/_components/Input'
 import { KeyRound } from 'lucide-react'

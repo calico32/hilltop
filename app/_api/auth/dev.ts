@@ -1,3 +1,5 @@
+'use server'
+
 import { ActionError } from '@/_api/types'
 import { prisma } from '@/_lib/database'
 import { Result } from 'kiyoi'

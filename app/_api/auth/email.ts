@@ -1,9 +1,11 @@
-import { SendVerificationEmailError, VerifyEmailData, VerifyEmailError } from '@/_api/types'
+'use server'
+
 import { prisma } from '@/_lib/database'
 import { sendEmail } from '@/_lib/email'
+import VerifyEmail from '@emails/VerifyEmail'
 import { Result, Session, decrypt, encrypt } from 'kiyoi'
 import { cookies } from 'next/headers'
-import VerifyEmail from '../../../emails/VerifyEmail'
+import { SendVerificationEmailError, VerifyEmailData, VerifyEmailError } from './_types'
 
 export async function sendVerificationEmail(): Result.Async<void, SendVerificationEmailError> {
   const session = await Session.get(cookies())

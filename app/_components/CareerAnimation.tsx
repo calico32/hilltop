@@ -9,7 +9,7 @@ export default function CareerAnimation(): JSX.Element {
   const element = useMemo(
     () =>
       ref ?? typeof document !== 'undefined' ? document.getElementById('career-animation') : null,
-    [ref]
+    [ref],
   )
   const [className, setClassName] = useState<string>('')
 
@@ -20,6 +20,44 @@ export default function CareerAnimation(): JSX.Element {
 
   const current = useMemo(() => bag[bagIndex], [bag, bagIndex])
   const [previous, setPrevious] = useState(current)
+
+  const [delay, setDelay] = useState(5000)
+  const [duration, setDuration] = useState({ min: 0.5, max: 2 })
+
+  useEffect(() => {
+    let progress = 0
+    let konamiCode = [
+      'ArrowUp',
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowDown',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowLeft',
+      'ArrowRight',
+      'b',
+      'a',
+      'Enter',
+    ]
+    const detectKonamiCode = (event: KeyboardEvent) => {
+      if (event.key === konamiCode[progress]) {
+        progress++
+        console.log(progress)
+        if (progress === konamiCode.length) {
+          setDelay(160)
+          setDuration({ min: 0.15, max: 0.15 })
+        }
+      } else {
+        progress = 0
+      }
+    }
+    console.log('adding event listener')
+
+    window.addEventListener('keydown', detectKonamiCode)
+    return () => {
+      window.removeEventListener('keydown', detectKonamiCode)
+    }
+  }, [])
 
   useEffect(() => {
     setClassName(!element ? '' : 'p-2')
@@ -34,7 +72,7 @@ export default function CareerAnimation(): JSX.Element {
       } else {
         setBagIndex((i) => i + 1)
       }
-    }, 5000)
+    }, delay)
 
     const onResize = (event: UIEvent) => {
       const target = event.target as Window
@@ -48,7 +86,7 @@ export default function CareerAnimation(): JSX.Element {
       clearInterval(interval)
       window.removeEventListener('resize', onResize)
     }
-  }, [])
+  }, [delay])
 
   const currentWidth = useMemo(() => {
     if (!element) return careers[current].length * 36 + 42
@@ -61,18 +99,17 @@ export default function CareerAnimation(): JSX.Element {
   const delta = Math.abs(current - previous)
   const currentOffset = current * -(offset + spacing) - spacing * 0.75
 
-  const maxDuration = 2
-  const minDuration = 0.5
-  const durationDelta = (maxDuration - minDuration) / careers.length
-  const duration = minDuration + delta * durationDelta * 1.5
+  const durationDelta = (duration.max - duration.min) / careers.length
+  const durationMs = duration.min + delta * durationDelta * 1.5
 
   return (
     <motion.div
+      suppressHydrationWarning
       ref={setRef}
       id="career-animation"
       className={clsx(
-        'block bg-emeraldgreen-1/40 text-[#45ff85] rounded-md overflow-hidden mt-4 relative',
-        className
+        'relative mt-4 block overflow-hidden rounded-md bg-emeraldgreen-1/40 text-[#45ff85]',
+        className,
       )}
       layout
       initial={{
@@ -84,7 +121,7 @@ export default function CareerAnimation(): JSX.Element {
         height: element ? offset + 16 : 0,
       }}
       transition={{
-        duration,
+        duration: durationMs,
         ease: 'easeInOut',
       }}
     >
@@ -98,15 +135,15 @@ export default function CareerAnimation(): JSX.Element {
           translateX: '-50%',
         }}
         transition={{
-          duration,
+          duration: durationMs,
           ease: 'easeInOut',
         }}
-        className="text-center absolute top-0 left-1/2 w-[9999px]"
+        className="absolute left-1/2 top-0 w-[9999px] text-center"
       >
         {careers.map((career) => (
           <motion.div
             key={career + offset + spacing}
-            className="w-full text-center flex items-center justify-center box-border"
+            className="box-border flex w-full items-center justify-center text-center"
             style={{
               height: offset,
               marginTop: spacing,

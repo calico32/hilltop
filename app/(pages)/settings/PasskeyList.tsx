@@ -12,23 +12,6 @@ interface PasskeyListProps {
 export default function PasskeyList({ initialData }: PasskeyListProps): JSX.Element {
   const { data: passkeyData, isLoading } = api.passkeys.$use('getAll')
 
-  // if (isLoading) {
-  //   const data: Pick<Passkey, 'credentialId' | 'created' | 'updated' | 'transports' | 'nickname'> =
-  //     {
-  //       credentialId: '12345678901234567890',
-  //       created: new Date(),
-  //       updated: new Date(),
-  //       transports: ['usb'],
-  //       nickname: 'Test Nickname',
-  //     }
-  //   return (
-  //     <>
-  //       <PasskeyCard passkey={data} skeleton />
-  //       <PasskeyCard passkey={data} skeleton />
-  //     </>
-  //   )
-  // }
-
   const passkeys = passkeyData ?? initialData
 
   return (

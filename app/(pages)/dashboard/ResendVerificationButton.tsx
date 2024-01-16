@@ -1,7 +1,7 @@
 'use client'
 
+import { SendVerificationEmailError } from '@/_api/auth/_types'
 import api from '@/_api/client'
-import { SendVerificationEmailError } from '@/_api/types'
 import Button from '@/_components/Button'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'

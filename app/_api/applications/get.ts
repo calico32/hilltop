@@ -2,7 +2,8 @@
 
 import { cache } from 'react'
 
-import { FullApplication, applicationInclude } from '@/_api/applications/common'
+import { applicationInclude } from '@/_api/applications/_common'
+import { FullApplication } from '@/_api/applications/_types'
 import { UserSession } from '@/_api/types'
 import { prisma } from '@/_lib/database'
 import { age } from '@/_lib/format'

@@ -1,13 +1,13 @@
 'use server'
 
-import { applicationInclude } from '@/_api/applications/common'
+import { applicationInclude } from '@/_api/applications/_common'
 import { ActionError, UserSession } from '@/_api/types'
 import { prisma } from '@/_lib/database'
 import { sendEmail } from '@/_lib/email'
+import ApplicationRejected from '@emails/ApplicationRejected'
 import { ApplicationStatus, Role } from '@prisma/client'
 import { Result, Session } from 'kiyoi'
 import { cookies } from 'next/headers'
-import ApplicationRejected from '../../../emails/ApplicationRejected'
 
 export async function sendRejectionEmail(applicationId: string): Result.Async<void, ActionError> {
   const session = await Session.get<UserSession>(cookies())

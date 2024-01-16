@@ -1,11 +1,12 @@
+'use server'
+
 import {
   AuthenticatorData,
   CollectedClientData,
-  PasskeyLoginData,
-  PasskeyLoginError,
-  PasskeyRequestOptions,
-} from '@/_api/types'
-import { getRpId, verifySignature } from '@/_api/util'
+  getRpId,
+  verifySignature,
+} from '@/_api/passkeys/_crypto'
+import { PasskeyLoginData, PasskeyLoginError, PasskeyRequestOptions } from '@/_api/passkeys/_types'
 import { COSEAlgorithm } from '@/_lib/cose'
 import { caching, prisma } from '@/_lib/database'
 import { User } from '@prisma/client'

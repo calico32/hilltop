@@ -1,6 +1,7 @@
 'use client'
 
-import { FullApplication } from '@/_api/applications/common'
+import { FullApplication } from '@/_api/applications/_types'
+
 import api from '@/_api/client'
 import Button from '@/_components/Button'
 import { avatar, fullName } from '@/_lib/format'

@@ -1,5 +1,3 @@
-'use server'
-
 import { beginPasskeyLogin, passkeyLogin } from '@/_api/passkeys/login'
 import { deletePasskey, getPasskeys, nicknamePasskey } from '@/_api/passkeys/manage'
 import { beginPasskeyRegistration, registerPasskey } from '@/_api/passkeys/register'

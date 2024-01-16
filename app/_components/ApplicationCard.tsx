@@ -1,4 +1,4 @@
-import { FullApplication } from '@/_api/applications/common'
+import { FullApplication } from '@/_api/applications/_types'
 import { LinkButton } from '@/_components/Button'
 import { applicationStatusColors, applicationStatuses } from '@/_lib/data'
 import { avatar, fullName } from '@/_lib/format'

@@ -1,6 +1,7 @@
 'use client'
 
-import { FullApplication } from '@/_api/applications/common'
+import { FullApplication } from '@/_api/applications/_types'
+
 import Button from '@/_components/Button'
 import { avatar, fullName } from '@/_lib/format'
 import { Dialog, Transition } from '@headlessui/react'

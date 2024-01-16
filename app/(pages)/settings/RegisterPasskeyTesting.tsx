@@ -1,5 +1,5 @@
 import api from '@/_api/client'
-import { PasskeyLoginError } from '@/_api/types'
+import { PasskeyLoginError } from '@/_api/passkeys/_types'
 import Button from '@/_components/Button'
 import { Dialog } from '@headlessui/react'
 import { KeyRound, X } from 'lucide-react'

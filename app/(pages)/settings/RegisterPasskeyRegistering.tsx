@@ -1,5 +1,5 @@
 import api from '@/_api/client'
-import { PasskeyRegistrationError } from '@/_api/types'
+import { PasskeyRegistrationError } from '@/_api/passkeys/_types'
 import Button from '@/_components/Button'
 import { Dialog } from '@headlessui/react'
 import { Loader2, X } from 'lucide-react'

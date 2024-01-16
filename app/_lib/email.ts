@@ -2,6 +2,7 @@ import { render } from '@react-email/components'
 import { Result } from 'kiyoi'
 import { createTransport } from 'nodemailer'
 import React from 'react'
+import 'server-only'
 
 export const transport = createTransport({
   host: process.env.EMAIL_HOST,
@@ -56,7 +57,7 @@ interface EmailOptions<P extends {}, T extends React.ComponentType<P>> {
 
 export async function sendEmail<P extends {}, T extends React.ComponentType<P>>(
   component: T,
-  options: EmailOptions<P, T>
+  options: EmailOptions<P, T>,
 ): Result.Async<void, Error> {
   const html = render(React.createElement(component, options.props))
   const text = render(React.createElement(component, options.props), { plainText: true })

@@ -1,22 +1,26 @@
-// Numbered statements in this section refer to the following section of the WebAuthn spec:
-// https://w3c.github.io/webauthn/#sctn-registering-a-new-credential
+'use server'
 
 import {
-  ActionError,
   Attestation,
   AuthenticatorData,
   CollectedClientData,
+  getRpId,
+} from '@/_api/passkeys/_crypto'
+import {
   PasskeyCreateOptions,
   PasskeyRegistrationData,
   PasskeyRegistrationError,
-} from '@/_api/types'
-import { getRpId } from '@/_api/util'
+} from '@/_api/passkeys/_types'
+import { ActionError } from '@/_api/types'
 import { caching, prisma } from '@/_lib/database'
 import { fullName } from '@/_lib/format'
 import { decode as cborDecode } from 'cbor-x'
 import crypto from 'crypto'
 import { Result, Session } from 'kiyoi'
 import { cookies, headers } from 'next/headers'
+
+// Numbered statements in this section refer to the following section of the WebAuthn spec:
+// https://w3c.github.io/webauthn/#sctn-registering-a-new-credential
 
 export async function beginPasskeyRegistration(): Result.Async<
   PasskeyCreateOptions,

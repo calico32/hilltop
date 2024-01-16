@@ -1,16 +1,17 @@
-// Numbered statements after this line refer to the following section of the WebAuthn spec:
-// https://w3c.github.io/webauthn/#sctn-verifying-assertion
+'use server'
 
 import {
-  ActionError,
   AuthenticatorData,
   CollectedClientData,
-  PasskeyLoginData,
-  PasskeyLoginError,
-  PasskeyRequestOptions,
-} from '@/_api/types'
-import { getRpId, verifySignature } from '@/_api/util'
+  getRpId,
+  verifySignature,
+} from '@/_api/passkeys/_crypto'
+import { PasskeyLoginData, PasskeyLoginError, PasskeyRequestOptions } from '@/_api/passkeys/_types'
+import { ActionError } from '@/_api/types'
 import { COSEAlgorithm } from '@/_lib/cose'
+
+// Numbered statements after this line refer to the following section of the WebAuthn spec:
+// https://w3c.github.io/webauthn/#sctn-verifying-assertion
 import { caching, prisma } from '@/_lib/database'
 import crypto from 'crypto'
 import { Result, Session } from 'kiyoi'

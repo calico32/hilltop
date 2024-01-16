@@ -1,7 +1,8 @@
 'use client'
 
 import RejectApplicationButton from '@/(pages)/applications/[id]/RejectApplicationButton'
-import { FullApplication } from '@/_api/applications/common'
+import { FullApplication } from '@/_api/applications/_types'
+
 import api from '@/_api/client'
 import {
   applicationStatusColors,

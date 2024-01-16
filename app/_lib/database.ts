@@ -1,11 +1,12 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaCacheStrategy, withAccelerate } from '@prisma/extension-accelerate'
+import 'server-only'
 
 export const prisma = new PrismaClient().$extends(withAccelerate()).$extends({
   client: {
     redact<Obj extends { [key: string]: unknown }, Key extends keyof Obj>(
       obj: Obj | null | undefined | Obj[],
-      keys: Key[]
+      keys: Key[],
     ): void {
       if (!obj) return
 

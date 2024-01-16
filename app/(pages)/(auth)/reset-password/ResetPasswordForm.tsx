@@ -1,7 +1,7 @@
 'use client'
 
+import { PasswordResetError } from '@/_api/auth/_types'
 import api from '@/_api/client'
-import { PasswordResetError } from '@/_api/types'
 import Button from '@/_components/Button'
 import Input from '@/_components/Input'
 import { useRouter } from 'next/navigation'

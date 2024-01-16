@@ -1,5 +1,5 @@
+import { PasswordResetError } from '@/_api/auth/_types'
 import api from '@/_api/client'
-import { PasswordResetError } from '@/_api/types'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'

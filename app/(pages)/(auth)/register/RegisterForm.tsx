@@ -9,7 +9,7 @@ import Input from '@/_components/Input'
 import { states } from '@/_lib/data'
 import { groupedNumberOnChange } from '@/_util/grouped-number-input'
 
-import { RegisterData, RegisterError } from '@/_api/types'
+import { RegisterData, RegisterError } from '@/_api/auth/_types'
 import Button from '@/_components/Button'
 import { useState } from 'react'
 import toast from 'react-hot-toast'

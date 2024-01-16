@@ -1,11 +1,14 @@
-import { ActionError, PasswordResetData, PasswordResetError } from '@/_api/types'
+'use server'
+
+import { ActionError } from '@/_api/types'
 import { prisma } from '@/_lib/database'
 import { sendEmail } from '@/_lib/email'
 import { fullName } from '@/_lib/format'
+import ResetPassword from '@emails/ResetPassword'
 import * as bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import { Result, decrypt, encrypt } from 'kiyoi'
-import ResetPassword from '../../../emails/ResetPassword'
+import { PasswordResetData, PasswordResetError } from './_types'
 
 export async function forgotPassword(email: string): Result.Async<void, ActionError> {
   const user = await prisma.user.findUnique({ where: { email } })
