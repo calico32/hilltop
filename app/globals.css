@@ -57,6 +57,11 @@
   transform: translateY(-100%);
 }
 
+.app-bar-bg {
+  @apply bg-white bg-opacity-75 pb-3 shadow backdrop-blur-md;
+  @apply !text-black;
+}
+
 .icon {
   font-family: 'Font Awesome 6 Duotone';
   position: relative;

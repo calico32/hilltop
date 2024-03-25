@@ -5,8 +5,7 @@ import api from '@/_api/client'
 import ApplicationCard from '@/_components/ApplicationCard'
 import Spinner from '@/_components/Spinner'
 import { ApplicationStatus } from '@prisma/client'
-import { ReadonlyURLSearchParams, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { ReadonlyURLSearchParams } from 'next/navigation'
 
 // export const metadata = {
 //   robots: { index: false, follow: false },
@@ -46,16 +45,21 @@ function stringifySearchParams(query: SearchApplicationQuery): string {
 }
 
 export default function Page(): JSX.Element {
-  const searchParams = useSearchParams()
-  const [query, setQuery] = useState<SearchApplicationQuery>(parseSearchParams(searchParams))
-  const [searchTerm, setSearchTerm] = useState<string | undefined>(query.search)
+  // const searchParams = useSearchParams()
+  // const [query, setQuery] = useState<SearchApplicationQuery>(parseSearchParams(searchParams))
+  // const [searchTerm, setSearchTerm] = useState<string | undefined>(query.search)
+  // const debouncedSearchTerm = useDebounce(searchTerm, 500)
 
-  useEffect(() => {
-    const path = `/applications?${stringifySearchParams(query)}`
-    window.history.replaceState({}, '', path)
-  }, [query])
+  // useEffect(() => {
+  //   const path = `/applications?${stringifySearchParams(query)}`
+  //   window.history.replaceState({}, '', path)
+  // }, [query])
 
-  const { data: applications, isLoading } = api.applications.$use('search', query)
+  // useEffect(() => {
+  //   setQuery((prev) => ({ ...prev, search: debouncedSearchTerm }))
+  // }, [debouncedSearchTerm])
+
+  const { data: applications, isLoading } = api.applications.$use('search', {})
   const { data: currentUser, isLoading: userLoading } = api.users.$use('get')
   //hi :)
   return (
@@ -64,11 +68,11 @@ export default function Page(): JSX.Element {
       <input
         id="search"
         type="text"
-        placeholder="Search Applications"
-        onKeyUp={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
-        className="rounded-md border border-gray-300 p-1"
+        placeholder="Search Applications..."
+        // onKeyUp={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
+        className="rounded-md border border-gray-300 px-3 py-1.5"
       />
-      <div className="pt-4">
+      <div className="space-y-4 pt-4">
         {isLoading || userLoading ? (
           <Spinner />
         ) : !applications || applications.length === 0 ? (

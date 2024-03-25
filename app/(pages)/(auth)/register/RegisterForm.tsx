@@ -415,7 +415,7 @@ export default function RegisterForm(): JSX.Element {
           receive email updates about available jobs and product updates.
         </label>
 
-        {process.env.NODE_ENV === 'development' && (
+        {(process.env.NODE_ENV === 'development' || true) && (
           <>
             <div className="col-span-2 mt-8 flex w-full items-baseline justify-around gap-2">
               <span className="text-lg italic text-gray-500">Developer tools:</span>
@@ -424,10 +424,10 @@ export default function RegisterForm(): JSX.Element {
                 color="accent"
                 small
                 onClick={() => {
-                  setValue('firstName', 'John')
+                  setValue('firstName', 'Casandra')
                   setValue('middleInitial', 'Q')
-                  setValue('lastName', 'Doe')
-                  setValue('preferredName', 'Johnny Doe')
+                  setValue('lastName', 'Mclaughlin')
+                  // setValue('preferredName', 'Johnny Doe')
                   setValue('dob', '1990-01-01')
                   setValue('taxId', '123-45-6789')
                   setValue('address1', '123 Main St')
@@ -435,7 +435,7 @@ export default function RegisterForm(): JSX.Element {
                   setValue('city', 'Anytown')
                   setValue('state', 'CA')
                   setValue('zip', '12345')
-                  setValue('email', 'john@example.org')
+                  setValue('email', 'casandra.mclaughlin@ethereal.email')
                   setValue('phone', '123-456-7890')
                   setValue('password', 'Password1')
                   setValue('confirmPassword', 'Password1')

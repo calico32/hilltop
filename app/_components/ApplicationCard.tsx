@@ -113,7 +113,7 @@ export default function ApplicationCard({
           {/* <div className="text-gray-600">
             {application.user.city}, {application.user.state}
           </div> */}
-          <div className="text-sm italic text-gray-600">{truncate(application.user.bio, 100)}</div>
+          <div className="text-sm italic text-gray-600">{truncate(application.user.bio, 150)}</div>
         </div>
         <div className="border-r border-gray-400" />
         <div className="flex flex-grow flex-col gap-4">
@@ -177,29 +177,56 @@ export default function ApplicationCard({
   }
 
   return (
-    <div className="flex flex-col gap-2 rounded-md border border-gray-300 p-3 shadow-md">
-      {currentUser && currentUser.id !== application.userId && (
-        <Link
-          className="flex cursor-pointer items-center gap-1 hover:underline"
-          href={`/profile/${application.userId}`}
-        >
-          <Image
-            src={avatar(application.user)}
-            alt=""
-            width={30}
-            height={30}
-            className="mr-2 self-center rounded-full"
-          />
-          <h1 className="text-xl font-medium">{fullName(application.user)}</h1>
-        </Link>
-      )}
-      <div className="my-auto font-semibold">
-        <h1 className="text-2xl">{application.listing.title}</h1>
-        <h1>Submitted: {application.created.toDateString()}</h1>
-        <h1>Status: {application.status.toString()}</h1>
+    <div className="relative flex gap-4 rounded-md border border-gray-300 p-3 shadow-md">
+      <div className="flex flex-grow flex-col gap-4">
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-semibold">{application.listing.title}</h1>
+          <span
+            className={clsx(
+              'rounded-full border px-2.5 py-0.5 text-sm lowercase',
+              applicationStatusColors[application.status],
+            )}
+          >
+            {applicationStatuses[application.status]}
+          </span>
+        </div>
+        <div className="flex items-center gap-8">
+          <div className="flex flex-col">
+            <span className="text-sm text-gray-600">Submitted</span>
+            <span className={clsx('text-sm')}>{application.created.toLocaleDateString()}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm text-gray-600">Last Updated</span>
+            <span className="text-sm">{application.updated.toLocaleDateString()}</span>
+          </div>
+          {application.reviewer && (
+            <div className="flex flex-col">
+              <span className="text-sm text-gray-600">Reviewer</span>
+              <span className="flex items-center gap-2 text-sm">
+                <Image
+                  src={avatar(application.reviewer)}
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="rounded-full"
+                />
+                {fullName(application.reviewer)}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
-      <hr />
-      <p className="ml-4">{application.listing.requirements}</p>
+      <div className="flex flex-col items-end">
+        {application.listing.requirements.map((req) => (
+          <p key={req}>{req}</p>
+        ))}
+
+        <div className="flex-1" />
+
+        <LinkButton href={`/applications/${application.id}`} small color="primary" className="mt-8">
+          View Application
+        </LinkButton>
+      </div>
     </div>
   )
 }

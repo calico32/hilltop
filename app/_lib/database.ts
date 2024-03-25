@@ -2,7 +2,22 @@ import { PrismaClient } from '@prisma/client'
 import { PrismaCacheStrategy, withAccelerate } from '@prisma/extension-accelerate'
 import 'server-only'
 
-export const prisma = new PrismaClient().$extends(withAccelerate()).$extends({
+const _prisma = new PrismaClient({
+  log: [
+    {
+      emit: 'event',
+      level: 'query',
+    },
+  ],
+})
+
+if (process.env.NODE_ENV === 'development') {
+  _prisma.$on('query', (event) => {
+    console.log(event.query)
+  })
+}
+
+export const prisma = _prisma.$extends(withAccelerate()).$extends({
   client: {
     redact<Obj extends { [key: string]: unknown }, Key extends keyof Obj>(
       obj: Obj | null | undefined | Obj[],

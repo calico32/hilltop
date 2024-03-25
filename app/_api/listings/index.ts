@@ -1,4 +1,4 @@
-import { getListing, getListings } from '@/_api/listings/get'
+import { getListing, getListings, getQuestions } from '@/_api/listings/get'
 
 const listings = {
   /**
@@ -14,6 +14,10 @@ const listings = {
    * - If the user is not an applicant, all listings are returned.
    */
   get: getListing,
+  /**
+   * Retrieves the application questions for a job listing.
+   */
+  getQuestions: getQuestions,
 }
 
 export default listings

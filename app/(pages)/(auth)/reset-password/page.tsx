@@ -4,9 +4,7 @@ import ResetPasswordForm from '@/(pages)/(auth)/reset-password/ResetPasswordForm
 import ResetPasswordHandler from '@/(pages)/(auth)/reset-password/ResetPasswordHandler'
 import Spinner from '@/_components/Spinner'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Suspense, useState } from 'react'
 
 interface ResetPasswordFormValues {
   password: string
@@ -14,13 +12,7 @@ interface ResetPasswordFormValues {
 }
 
 export default function Page(): JSX.Element {
-  const params = useSearchParams()
   const [isValidating, setIsValidating] = useState(true)
-
-  const {
-    handleSubmit,
-    formState: { isSubmitting, errors },
-  } = useForm<ResetPasswordFormValues>()
 
   if (isValidating)
     return (
@@ -29,7 +21,9 @@ export default function Page(): JSX.Element {
           <h1 className="text-3xl font-semibold">Checking your account...</h1>
           <Spinner size={48} />
         </div>
-        <ResetPasswordHandler setIsValidating={setIsValidating} />
+        <Suspense>
+          <ResetPasswordHandler setIsValidating={setIsValidating} />
+        </Suspense>
       </>
     )
 
@@ -50,7 +44,9 @@ export default function Page(): JSX.Element {
         at least 1 uppercase letter, 1 lowercase letter, and 1 number.
       </p>
 
-      <ResetPasswordForm token={params.get('token') ?? ''} />
+      <Suspense>
+        <ResetPasswordForm />
+      </Suspense>
     </div>
   )
 }

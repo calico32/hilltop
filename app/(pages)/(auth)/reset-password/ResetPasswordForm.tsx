@@ -4,7 +4,7 @@ import { PasswordResetError } from '@/_api/auth/_types'
 import api from '@/_api/client'
 import Button from '@/_components/Button'
 import Input from '@/_components/Input'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
@@ -13,11 +13,10 @@ interface ResetPasswordFormValues {
   confirmPassword: string
 }
 
-interface ResetPasswordFormProps {
-  token: string
-}
+export default function ResetPasswordForm(): JSX.Element {
+  const params = useSearchParams()
+  const token = params.get('token') ?? ''
 
-export default function ResetPasswordForm({ token }: ResetPasswordFormProps): JSX.Element {
   const router = useRouter()
   const form = useForm<ResetPasswordFormValues>()
   const {

@@ -4,7 +4,6 @@ import api from '@/_api/client'
 import { ActionError } from '@/_api/types'
 import Button from '@/_components/Button'
 import Input from '@/_components/Input'
-import { useRouter } from 'next/navigation'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
@@ -14,10 +13,11 @@ interface LoginFormValues {
 }
 
 export default function ForgotPasswordForm(): JSX.Element {
-  const router = useRouter()
   const form = useForm<LoginFormValues>()
   const {
     handleSubmit,
+    setValue,
+    reset,
     formState: { isSubmitting },
   } = form
 
@@ -69,6 +69,35 @@ export default function ForgotPasswordForm(): JSX.Element {
           >
             Reset Password
           </Button>
+
+          {(process.env.NODE_ENV === 'development' || true) && (
+            <>
+              <div className="col-span-2 mt-8 flex w-full items-baseline justify-around gap-2">
+                <span className="text-lg italic text-gray-500">Developer tools:</span>
+                <Button
+                  type="button"
+                  color="accent"
+                  small
+                  onClick={() => {
+                    setValue('email', 'casandra.mclaughlin@ethereal.email')
+                  }}
+                >
+                  Populate test data
+                </Button>
+                <Button
+                  type="button"
+                  minimal
+                  small
+                  color="accent"
+                  onClick={() => {
+                    reset()
+                  }}
+                >
+                  Clear form
+                </Button>
+              </div>
+            </>
+          )}
         </FormProvider>
       </form>
     </>

@@ -1,3 +1,4 @@
+import ViewApplicationPage from '@/(pages)/applications/[id]/ViewApplicationPage'
 import server from '@/_api/server'
 import { Role } from '@prisma/client'
 import { notFound } from 'next/navigation'
@@ -17,6 +18,15 @@ export default async function Page({ params }: { params: { id: string } }): Prom
     const applicantInfo = await server.users.getSensitiveData(application.user.id)
     return (
       <ReviewApplicationPage
+        application={application}
+        currentUser={currentUser}
+        sensitiveData={applicantInfo!}
+      />
+    )
+  } else {
+    const applicantInfo = await server.users.getSensitiveData()
+    return (
+      <ViewApplicationPage
         application={application}
         currentUser={currentUser}
         sensitiveData={applicantInfo!}

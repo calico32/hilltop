@@ -1,4 +1,5 @@
 import ReviewApplicationPage from '@/(pages)/applications/[id]/ReviewApplicationPage'
+import ViewApplicationPage from '@/(pages)/applications/[id]/ViewApplicationPage'
 import server from '@/_api/server'
 import PageModal from '@/_components/PageModal'
 import { Role } from '@prisma/client'
@@ -15,6 +16,18 @@ export default async function Page({ params }: { params: { id: string } }): Prom
     return (
       <PageModal>
         <ReviewApplicationPage
+          modal
+          application={application}
+          currentUser={currentUser}
+          sensitiveData={applicantInfo!}
+        />
+      </PageModal>
+    )
+  } else {
+    const applicantInfo = await server.users.getSensitiveData()
+    return (
+      <PageModal>
+        <ViewApplicationPage
           modal
           application={application}
           currentUser={currentUser}

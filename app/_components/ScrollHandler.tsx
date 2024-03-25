@@ -1,5 +1,6 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 type ScrollInfo = {
@@ -10,11 +11,13 @@ type ScrollInfo = {
 }
 
 export default function ScrollHandler(): JSX.Element {
+  const pathname = usePathname()
   const [scrollInfo, setScrollInfo] = useState<ScrollInfo>({
     direction: 'down',
     top: 0,
     deltaDirChange: 0,
   })
+  const [bg, setBg] = useState(false)
 
   useEffect(() => {
     let lastDirChange = 0
@@ -32,6 +35,8 @@ export default function ScrollHandler(): JSX.Element {
         top,
         deltaDirChange,
       })
+
+      setBg(top > 400 && pathname === '/')
     }
 
     window.addEventListener('scroll', handleScroll)
@@ -56,6 +61,13 @@ export default function ScrollHandler(): JSX.Element {
       appBar.classList.toggle('app-bar-hidden', hidden)
     }
   }, [scrollInfo])
+
+  useEffect(() => {
+    const appBar = document.querySelector('nav')
+    if (appBar) {
+      appBar.classList.toggle('app-bar-bg', bg)
+    }
+  }, [bg])
 
   return <></>
 }

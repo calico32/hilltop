@@ -21,15 +21,24 @@ export interface EmailData {
   replyTo?: string
 }
 
-export async function sendMail(to: string, data: EmailData): Promise<void> {
-  await transport.sendMail({
-    from: data.from ?? process.env.EMAIL_FROM,
-    to,
-    replyTo: data.replyTo ?? process.env.EMAIL_REPLY_TO,
-    subject: data.subject,
-    html: data.html,
-    text: data.text,
-  })
+export async function sendEmail<P extends {}, T extends React.ComponentType<P>>(
+  component: T,
+  options: EmailOptions<P, T>,
+): Result.Async<void, Error> {
+  const html = render(React.createElement(component, options.props))
+  const text = render(React.createElement(component, options.props), { plainText: true })
+
+  // await transport.sendMail({
+  //   from: options.from ?? process.env.EMAIL_FROM ?? 'noreply@hilltop.works',
+  //   replyTo: options.replyTo ?? process.env.EMAIL_REPLY_TO,
+  //   subject: options.subject,
+  //   to: options.to,
+  //   html,
+  //   text,
+  //   attachments: [{}],
+  // })
+
+  return Result.ok()
 }
 
 // export const sendConfirmationEmail = async (registration: Registration): Promise<void> => {
@@ -55,21 +64,27 @@ interface EmailOptions<P extends {}, T extends React.ComponentType<P>> {
   replyTo?: string
 }
 
-export async function sendEmail<P extends {}, T extends React.ComponentType<P>>(
-  component: T,
-  options: EmailOptions<P, T>,
-): Result.Async<void, Error> {
-  const html = render(React.createElement(component, options.props))
-  const text = render(React.createElement(component, options.props), { plainText: true })
+// export async function sendEmail<P extends {}, T extends React.ComponentType<P>>(
+//   component: T,
+//   options: EmailOptions<P, T>,
+// ): Result.Async<void, Error> {
+//   const html = render(React.createElement(component, options.props))
+//   const text = render(React.createElement(component, options.props), { plainText: true })
 
-  await transport.sendMail({
-    from: options.from ?? process.env.EMAIL_FROM,
-    replyTo: options.replyTo ?? process.env.EMAIL_REPLY_TO,
-    to: options.to,
-    subject: options.subject,
-    html,
-    text,
-  })
+//   const resend = new Resend(process.env.RESEND_API_KEY!);
 
-  return Result.ok()
-}
+//   const o = {
+//     from: options.from ?? process.env.EMAIL_FROM ?? 'noreply@hilltop.works',
+//     reply_to: options.replyTo ?? process.env.EMAIL_REPLY_TO,
+//     subject: options.subject,
+//     to: options.to,
+//     html,
+//     text,
+//   }
+
+//   console.log(o)
+
+//   await resend.emails.send(o)
+
+//   return Result.ok()
+// }

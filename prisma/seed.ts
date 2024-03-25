@@ -9,6 +9,7 @@ import {
   Role,
 } from '@prisma/client'
 import * as bcrypt from 'bcryptjs'
+import { stripIndent } from 'common-tags'
 import fs from 'fs/promises'
 import { encrypt } from 'kiyoi'
 import { v5 as uuidv5 } from 'uuid'
@@ -84,9 +85,21 @@ await prisma.user.upsert({
 const jobs: Record<string, Prisma.JobListingCreateInput> = {
   softwareEngineer: {
     title: 'Software Engineer',
-    description: 'We are looking for a software engineer to join our team.',
+    description: stripIndent`
+      We are looking for a software engineer to join our team.
+
+      Work with a team of talented engineers to build the online presence and internal tools for our company! Your responsibilities will include:
+
+      - Writing code for web applications
+      - Testing code
+      - Collaborating with other engineers
+      - Participating in code reviews
+      - Attending meetings
+
+      We offer health, dental, and vision insurance, as well as a 401(k) with employer match. We are an equal opportunity employer and value diversity at our company.
+    `,
     benefits: ['Health insurance', 'Dental insurance', 'Vision insurance'],
-    requirements: ["Bachelor's degree in Computer Science", '3+ years of experience'],
+    requirements: ['Degree in related field', '2+ years of experience'],
     responsibilities: ['Write code', 'Test code'],
     tags: ['Software', 'Engineering'],
 
@@ -104,6 +117,31 @@ const jobs: Record<string, Prisma.JobListingCreateInput> = {
           id: id('engineering'),
           name: 'Engineering',
         },
+      },
+    },
+    questions: {
+      createMany: {
+        data: [
+          {
+            sequence: 1,
+            question: 'What makes you a good fit for this position?',
+            required: true,
+            type: QuestionType.LongText,
+          },
+          {
+            sequence: 2,
+            question:
+              "Do you hold a bachelor's degree in computer science, software engineering, or a related field? If so, please list the degree and institution.",
+            required: false,
+            type: QuestionType.ShortText,
+          },
+          {
+            sequence: 3,
+            question: 'What is your favorite food?',
+            required: false,
+            type: QuestionType.ShortText,
+          },
+        ],
       },
     },
   },
@@ -242,13 +280,10 @@ const jobs: Record<string, Prisma.JobListingCreateInput> = {
     },
   },
   cook: {
-    title: 'Cook',
+    title: 'Line Cook',
     description: 'We are looking for a chef to join our team.',
     benefits: ['Health insurance', 'Dental insurance', 'Vision insurance'],
-    requirements: [
-      'Degree/certification from an accredited nursing program',
-      '3+ years of experience',
-    ],
+    requirements: ['High school diploma/GED', 'Culinary degree or equivalent experience'],
     responsibilities: ['Prepare meals', 'Clean and sanitize kitchens'],
     tags: ['Cook'],
 
@@ -377,7 +412,19 @@ const jobs: Record<string, Prisma.JobListingCreateInput> = {
   },
   socialWorker: {
     title: 'Social Worker',
-    description: 'We are looking for a social worker to join our team.',
+    description: stripIndent`
+      We are looking for a social worker to join our team.
+
+      Work with a team of talented social workers to provide support to our clients! Your responsibilities will include:
+
+      - Facilitating group sessions
+      - Conducting individual assessments
+      - Collaborating with other social workers
+      - Participating in case reviews
+      - Attending meetings
+
+      We offer health, dental, and vision insurance, as well as a 401(k) with employer match. We are an equal opportunity employer and value diversity at our company.
+    `,
     benefits: ['Health insurance', 'Dental insurance', 'Vision insurance'],
     requirements: ['Licensed social worker', '3+ years of experience'],
     responsibilities: ['Group faciliation', 'Individual assessments'],
@@ -497,10 +544,53 @@ const alice = Prisma.validator<
   phone: '5555555555',
 })
 
+const charlieAvatarData = await fs.readFile(__dirname + '/seed-assets/charlie.png')
+const charlieAvatar = await prisma.storage.upsert({
+  where: { id: id('charlie-avatar') },
+  create: {
+    id: id('charlie-avatar'),
+    name: 'charlie.png',
+    type: 'image/png',
+    data: charlieAvatarData,
+    size: charlieAvatarData.length,
+  },
+  update: {
+    name: 'charlie.png',
+    type: 'image/png',
+    data: charlieAvatarData,
+    size: charlieAvatarData.length,
+  },
+})
+
+const charlie = Prisma.validator<
+  Prisma.XOR<Prisma.UserCreateInput, Prisma.UserUncheckedCreateInput>
+>()({
+  id: id('charlie'),
+  firstName: 'Charlie',
+  lastName: 'Spring',
+  bio: 'Hi! I am a software engineer with 5 years of experience. I am looking for a full-time position in the Springfield area. I am proficient in JavaScript, TypeScript, and Python. I am also familiar with React, Node.js, and Django. I am passionate about creating accessible and inclusive web applications. I am excited to join a team that values diversity and inclusion. Looking forward to hearing from you!',
+  email: 'charlie@example.org',
+  address1: '123 Main St',
+  address2: 'Apt 1',
+  city: 'New Providence',
+  state: 'NJ',
+  zip: '12345',
+  password: await bcrypt.hash('password', 10),
+  avatar: { connect: charlieAvatar },
+  dob: await encrypt('1998-01-01'),
+  taxId: await encrypt('123-45-6789'),
+})
+
 await prisma.user.upsert({
   where: { id: id('alice') },
   create: alice,
   update: alice,
+})
+
+await prisma.user.upsert({
+  where: { id: id('charlie') },
+  create: charlie,
+  update: charlie,
 })
 
 const application = Prisma.validator<
@@ -564,4 +654,22 @@ await prisma.jobApplication.upsert({
   where: { id: application.id },
   create: application,
   update: application,
+})
+
+const application2 = Prisma.validator<
+  Prisma.XOR<Prisma.JobApplicationCreateInput, Prisma.JobApplicationUncheckedCreateInput>
+>()({
+  id: id('application2'),
+  listing: {
+    connect: { id: id('softwareEngineer') },
+  },
+  status: ApplicationStatus.Interviewing,
+  user: { connect: { id: charlie.id } },
+  reviewer: { connect: bob },
+})
+
+await prisma.jobApplication.upsert({
+  where: { id: application2.id },
+  create: application2,
+  update: application2,
 })

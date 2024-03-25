@@ -25,6 +25,8 @@ export default function LoginForm(): JSX.Element {
   const {
     handleSubmit,
     formState: { isSubmitting },
+    setValue,
+    reset,
   } = form
 
   const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
@@ -125,6 +127,36 @@ export default function LoginForm(): JSX.Element {
           >
             Sign in
           </Button>
+
+          {(process.env.NODE_ENV === 'development' || true) && (
+            <>
+              <div className="col-span-2 mt-8 flex w-full items-baseline justify-around gap-2">
+                <span className="text-lg italic text-gray-500">Developer tools:</span>
+                <Button
+                  type="button"
+                  color="accent"
+                  small
+                  onClick={() => {
+                    setValue('email', 'casandra.mclaughlin@ethereal.email')
+                    setValue('password', 'Password1')
+                  }}
+                >
+                  Populate test data
+                </Button>
+                <Button
+                  type="button"
+                  minimal
+                  small
+                  color="accent"
+                  onClick={() => {
+                    reset()
+                  }}
+                >
+                  Clear form
+                </Button>
+              </div>
+            </>
+          )}
         </FormProvider>
       </form>
     </>

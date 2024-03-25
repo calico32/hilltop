@@ -17,14 +17,10 @@ export default async function Page({ params }: { params: { id: string } }): Prom
         <ArrowLeft size={20} strokeWidth={1.5} />
         Back to listing
       </Link>
-      <div className="mb-4 flex items-start">
-        <div>
-          <h1 className="text-3xl">
-            Apply for <strong>{listing.title}</strong>
-          </h1>
-          <ApplyForm />
-        </div>
-      </div>
+      <h1 className="text-3xl">
+        Apply for <strong>{listing.title}</strong>
+      </h1>
+      <ApplyForm listing={listing} />
     </>
   )
 }

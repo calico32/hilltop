@@ -11,17 +11,17 @@ import {
   Tailwind,
   Text,
 } from '@react-email/components'
-import { nanoid } from 'nanoid'
 import resolveConfig from 'tailwindcss/resolveConfig'
 import config from '../tailwind.config'
 
 const baseUrl =
-  process.env.NODE_ENV === 'development'
+  process.env.NEXT_PUBLIC_BASE_URL ??
+  (process.env.NODE_ENV === 'development'
     ? 'http://localhost:3000'
-    : process.env.BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')
+    : process.env.BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : ''))
 
 export default function ResetPassword({
-  url = `${baseUrl}/reset-password?token=${nanoid()}`,
+  url = `${baseUrl}/reset-password?token=Fe26.2**79cf5e8824657db41cb9ba20e2ada00cde93dc224061da16b5544c152c12e1e7*s1IV_B91_rHaomyjUa6pmw*Horc9N4g6sbSBdbohGmj4dclV46cPa9_L3ALDp-0HhT7ClBNQ912aEcqXxadX3tesUhdbqvb5FibGl8rJzNhFfW0dcNJO5n0ssz0Sa_WMv_7fJeOJKc8x_rdgUhbGA5Pc8pku8O9BsbNI826-yxwF7eHZSLXcEjv0RWrNN171BCKODodRq-NTHUJrx8NyD10**b07f0d80c0305497eab695f5c75608a7df27cc15d160e6d89454ebb8f84ed2a2*Jka-gTMRjeHQ0o4DbEa7R-GYK8Au0VFwmLTWl4hzKrU`,
   name = 'John Doe',
 }: {
   url: string

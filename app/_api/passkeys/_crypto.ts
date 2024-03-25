@@ -1,4 +1,5 @@
 import { COSEAlgorithm, COSEKey } from '@/_lib/cose'
+import { decodeMultiple as cborDecodeMultiple } from 'cbor-x'
 import crypto, { webcrypto } from 'crypto'
 import { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers'
 
@@ -72,8 +73,7 @@ export function parseRest(data: Buffer): [AttestedCredentialData, any] {
   obj.credentialPublicKey = Uint8Array.prototype.slice.call(data, 18 + obj.credentialIdLength)
 
   let extensions
-    // @ts-ignore cbor-x types are wrong
-  ;[obj.publicKey, extensions] = cborDecodeMultiple(obj.credentialPublicKey)
+    ;[obj.publicKey, extensions] = (cborDecodeMultiple(obj.credentialPublicKey) as any)
 
   if (obj.publicKey['3']) {
     obj.publicKey.alg = obj.publicKey['3'] as number

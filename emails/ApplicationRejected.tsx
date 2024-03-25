@@ -1,4 +1,3 @@
-import { fullName } from '@/_lib/format'
 import { JobListing, User } from '@prisma/client'
 import {
   Body,
@@ -13,12 +12,14 @@ import {
   Text,
 } from '@react-email/components'
 import resolveConfig from 'tailwindcss/resolveConfig'
+import { fullName } from '../app/_lib/format'
 import config from '../tailwind.config'
 
 const baseUrl =
-  process.env.NODE_ENV === 'development'
+  process.env.NEXT_PUBLIC_BASE_URL ??
+  (process.env.NODE_ENV === 'development'
     ? 'http://localhost:3000'
-    : process.env.BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')
+    : process.env.BASE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : ''))
 
 export default function ApplicationRejected({
   application: { user, listing } = {

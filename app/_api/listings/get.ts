@@ -56,3 +56,13 @@ export const getListing = cache(async (id: string) => {
   })
   return listing
 })
+
+export const getQuestions = cache(async (id: string) => {
+  const questions = await prisma.jobListingQuestion.findMany({
+    where: {
+      listingId: id,
+    },
+  })
+
+  return questions
+})

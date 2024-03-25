@@ -11,7 +11,10 @@
     "generate": "prisma generate --no-engine",
     "diff": "dotenv -e .env.development -- sh -c 'prisma migrate diff --from-url \"$DIRECT_URL\" --to-schema-datamodel prisma/schema.prisma'",
     "dev": "next dev",
-    "email:dev": "email dev -p 3001"
+    "email:dev": "email dev -p 3001",
+    "up": "bunx concurrently -k -p '[{name}]' -c 'blue.dim,green.dim,cyan.dim' -n 'next,db,ssl' 'bun start' 'docker compose up' 'sudo bunx local-ssl-proxy -s 443 -t 3000 -c hilltop.works.pem -k hilltop.works-key.pem'",
+    "dev:up": "bunx concurrently -k -p '[{name}]' -c 'blue.dim,green.dim,cyan.dim' -n 'next,db,ssl' 'bun dev' 'docker compose up' 'sudo bunx local-ssl-proxy -s 443 -t 3000 -c hilltop.works.pem -k hilltop.works-key.pem'",
+    "orchestrate": "bunx concurrently -k -p '[{name}]' -c 'blue.dim,green.dim,cyan.dim' -n 'hilltop,vnc,x11vnc', 'bun up' 'pushd ~/dev/calico32/vnc && bun up' 'x11vnc -display :0 -forever -rfbport 5900 -clip 2560x1600+0+0 -noxrandr -geometry 2560x1600 -passwd hilltop.works -ssl ~/vnc.pem'"
   },
   "trustedDependencies": [
     "sharp"
@@ -57,6 +60,7 @@
     "react-hot-toast": "^2.4.1",
     "react-markdown": "^9.0.1",
     "react-responsive-masonry": "^2.1.7",
+    "resend": "^3.1.0",
     "server-only": "^0.0.1",
     "sharp": "^0.32.6",
     "swr": "^2.2.4",
